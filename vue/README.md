@@ -14,16 +14,24 @@ See [Vite Configuration Reference](https://vite.dev/config/).
 
 ```sh
 npm install
+#or
+bun install
 ```
 
 ### Compile and Hot-Reload for Development
 
 ```sh
 npm run dev
+#or
+bun run dev
+#or
+bun dev
 ```
 
 ### Compile and Minify for Production
 
 ```sh
 npm run build
+#or
+bun run build
 ```

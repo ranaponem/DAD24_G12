@@ -28,3 +28,8 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# npm / bun
+/node_modules
+bun.lockb
+package-lock.json
