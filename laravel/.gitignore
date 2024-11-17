@@ -19,6 +19,7 @@ yarn-error.log
 .vscode/
 .zed/
 /.vagrant
+composer.lock
 
 # Laravel 4 specific
 bootstrap/compiled.php
