@@ -35,7 +35,7 @@ export const useAuthStore = defineStore('auth', () => {
   })
 
   const userPhotoUrl = computed(() => {
-    const photoFile = user.value ? (user.value.photoFileName ?? '') : ''
+    const photoFile = user.value ? (user.value.photoFilename ?? '') : ''
     if (photoFile) {
       return axios.defaults.baseURL.replaceAll('/api', photoFile)
     }
@@ -56,7 +56,7 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = responseLogin.data.token
       axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
       const responseUser = await axios.get('users/me')
-      user.value = responseUser.data
+      user.value = responseUser.data.data
       repeatRefreshToken()
       return user.value
     } catch (e) {

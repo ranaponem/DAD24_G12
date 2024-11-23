@@ -10,17 +10,17 @@ import Toaster from './components/ui/toast/Toaster.vue';
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav class="flex items-center justify-start h-16 space-x-8">
           <RouterLink to="/"
-            class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium px-2 transition-colors"
             active-class="text-blue-600 font-semibold">
             Home
           </RouterLink>
           <RouterLink to="/testers/laravel"
-            class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium px-2 transition-colors"
             active-class="text-blue-600 font-semibold">
             Laravel Tester
           </RouterLink>
           <RouterLink to="/testers/websocket"
-            class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium px-2 transition-colors"
             active-class="text-blue-600 font-semibold">
             WebSockets Tester
           </RouterLink>

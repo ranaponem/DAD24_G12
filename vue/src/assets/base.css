@@ -19,11 +19,17 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: #F47500;
+    --primary-light: #FF9634;
+    --primary-dark: #C15C00;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: #7407A3;
+    --secondary-light: #862AAD;
+    --secondary-dark: #5B0580;
+
+    --tertiary: #DF0038;
+    --tertiary-light: #EA305E;
+    --tertiary-dark: #B0002C;
 
     --accent: 210 40% 96.1%;
     --accent-foreground: 222.2 47.4% 11.2%;
@@ -52,11 +58,23 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: #F47500;
+    --primary-light: #FFAC5F;
+    --primary-m-light: #FF9634;
+    --primary-m-dark: #C15C00;
+    --primary-dark: #974800;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: #7407A3;
+    --secondary-light: #9A4CBC;
+    --secondary-m-light: #862AAD;
+    --secondary-m-dark: #5B0580;
+    --secondary-dark: #470364;
+
+    --tertiary: #DF0038;
+    --tertiary-light: #ED597E;
+    --tertiary-m-light: #EA305E;
+    --tertiary-m-dark: #B0002C;
+    --tertiary-dark: #8A0023;
 
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
