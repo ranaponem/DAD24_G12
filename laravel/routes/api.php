@@ -15,3 +15,9 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/auth/refreshtoken', [AuthController::class,'refreshtoken']);
     Route::get('/users/me', [UserController::class, 'showMe']);
 });
+
+/*
+Route::any('/auth/login', function() {
+    abort(404);
+});
+*/
