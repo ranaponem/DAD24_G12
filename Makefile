@@ -1,6 +1,6 @@
 
 GROUP := dad-group-12
-VERSION_LARAVEL := "1.0.4"
+VERSION_LARAVEL := "1.0.5"
 VERSION_VUE := "1.0.3"
 VERSION_WS := 1.0.3
 
