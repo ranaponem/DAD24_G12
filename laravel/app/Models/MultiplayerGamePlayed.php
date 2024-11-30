@@ -25,13 +25,13 @@ class MultiplayerGamePlayed extends Model
         'pairs_discovered',
     ];
 
-  public function game() : BelongsTo
-  {
-    return $this.belongsTo(Game::class);
-  }
-  
   public function user() : BelongsTo
   {
-    return $this.belongsTo(User::class);
+    return $this->belongsTo(User::class, 'user_id', 'id');
+  }
+
+  public function game() : BelongsTo
+  {
+    return $this->belongsTo(Game::class, 'game_id', 'id');
   }
 }

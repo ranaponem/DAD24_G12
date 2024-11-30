@@ -26,23 +26,28 @@ class Game extends Model
         'board_id',
     ];
 
-    public function creator() : BelongsTo
+    public function creator(): BelongsTo
     {
-      return $this.belongsTo(User::class, 'created_user_id');
-    } 
-    
-    public function winner() : BelongsTo
-    {
-      return $this.belongsTo(User::class, 'winner_user_id');
-    } 
+        return $this->belongsTo(User::class, 'created_user_id', 'id');
+    }
 
-    public function board() : BelongsTo
+    public function winner(): BelongsTo
     {
-      return $this.belongsTo(Board::class);
-    } 
+        return $this->belongsTo(User::class, 'winner_user_id', 'id');
+    }
 
-    public function multiplayerGamesPlayed() : HasMany
+    public function transactions()
     {
-      return $this.HasMany(MultiplayerGamePlayed::class);
-    } 
+        return $this->hasMany(Transaction::class, 'game_id', 'id');
+    }
+
+    public function board(): BelongsTo
+    {
+        return $this->belongsTo(Board::class);
+    }
+
+    public function multiplayerGamesPlayed(): HasMany
+    {
+        return $this->HasMany(MultiplayerGamePlayed::class);
+    }
 }
