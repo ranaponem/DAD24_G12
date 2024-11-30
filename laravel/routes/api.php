@@ -15,6 +15,9 @@ Route::post('/auth/login', [AuthController::class, "login"])->name('login');
 Route::post('/users', [UserController::class, 'store'])
     ->can('create', User::class);
 
+# Get All
+Route::get('/games', [GameController::class, 'index']);
+
 Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/auth/refreshtoken', [AuthController::class,'refreshtoken']);
@@ -40,5 +43,3 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/games/my', [GameController::class, 'showMy']);
 });
 
-# Get All
-Route::get('/games', [GameController::class, 'index']);

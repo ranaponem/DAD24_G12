@@ -58,8 +58,8 @@ class GameController extends Controller
       if($request->query('score_type') === 'time')
         $query->orderBy('total_time', 'asc'); 
 
-      //else if($request->query('score_type') === 'turns')
-      //  $query->orderBy('/*TURNOS*/', 'asc');
+      else if($request->query('score_type') === 'turns')
+        $query->orderBy('total_turns_winner', 'asc');
 
       else
         return response()->json(['message' => 'Invalid score type: accepted values are \'time\' and \'turns\''], 404);
