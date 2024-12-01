@@ -3,7 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GameController;
 use App\Models\User;
+use App\Models\Game;
 
 //Route::get('/user', function (Request $request) {
 //    return $request->user();
@@ -12,6 +14,9 @@ use App\Models\User;
 Route::post('/auth/login', [AuthController::class, "login"])->name('login');
 Route::post('/users', [UserController::class, 'store'])
     ->can('create', User::class);
+
+# Get All
+Route::get('/games', [GameController::class, 'index']);
 
 Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -33,4 +38,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Delete user
     Route::delete('/users/{user}', [UserController::class, 'delete'])
         ->can('delete', User::class);
+
+    # Get My
+    Route::get('/games/my', [GameController::class, 'showMy']);
 });
