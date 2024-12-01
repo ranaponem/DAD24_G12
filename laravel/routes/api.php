@@ -42,4 +42,3 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Get My
     Route::get('/games/my', [GameController::class, 'showMy']);
 });
-

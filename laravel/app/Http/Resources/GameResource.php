@@ -4,6 +4,8 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\UserResource;
+use App\Http\Resources\BoardResource;
 
 class GameResource extends JsonResource
 {
@@ -14,6 +16,16 @@ class GameResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "id" => $this->id,
+            "created_by" => new UserResource($this->creator),
+            "winned_by" => $this->winner ? new UserResource($this->winner) : null,
+            "type" => $this->type,
+            "status" => $this->status,
+            "began_at" => $this->began_at,
+            "ended_at" => $this->ended_at,
+            "total_time" => $this->total_time,
+            "board" => new BoardResource($this->board),
+        ];
     }
 }

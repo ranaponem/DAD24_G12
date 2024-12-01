@@ -45,6 +45,9 @@ class UserController extends Controller
     }
     
     public function destroy(User $user) {
+        if($user->photo_filename && Storage::fileExists(UserController::PHOTO_PATH . $user->photo_filename)) {
+            Storage::delete(UserController::PHOTO_PATH . $user->photo_filename);
+        }
         $user->delete();
 
         return response()->json(null, 204);
