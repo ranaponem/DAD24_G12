@@ -41,5 +41,11 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
     # Get My
     Route::get('/games/my', [GameController::class, 'showMy']);
+
+    # Post
+    Route::post('/games', [GameController::class, 'store']);
+
+    # Update partial
+    Route::patch('/games/{game}', [GameController::class, 'update']);
 });
 

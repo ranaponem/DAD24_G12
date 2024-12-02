@@ -7,12 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\Game;
 use App\Models\Board;
 use App\Http\Resources\GameResource;
+use App\Http\Requests\CreateGameRequest;
+use App\Http\Requests\UpdateGameRequest;
 
 class GameController extends Controller
 {
   public function index(GameTypeRequest $request)
   {
-    $query = Game::where('status', 'E');
+    $query = Game::where('status', Game::STATUS_ENDED);
 
     $attributesResponse = $this->readAttributes($request, $query);
 
@@ -22,20 +24,42 @@ class GameController extends Controller
   public function showMy(GameTypeRequest $request)
   {
     $userId = $request->user()->id;
-    $type = $request->query('type') ?? 'S';
+    $type = $request->query('type') ?? Game::TYPE_SINGLEPLAYER;
 
-    $query = Game::when($type == 'S', function ($query) use ($userId) {
-      return $query->where('created_user_id', $userId)->where('type', 'S');
-    })->when($type == 'A' || $type == 'M', function ($query) use ($userId) {
+    $query = Game::when($type == Game::TYPE_SINGLEPLAYER, function ($query) use ($userId) {
+      return $query->where('created_user_id', $userId)->where('type', Game::TYPE_SINGLEPLAYER);
+    })->when($type == 'A' || $type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
       return $query->where('winner_user_id', $userId)
                 ->orWhere('created_user_id', $userId);
-    })->when($type == 'M', function ($query) use ($userId) {
-      return $query->where('type', 'M');
-    })->where('status', 'E');
+    })->when($type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
+      return $query->where('type', Game::TYPE_MULTIPLAYER);
+    })->where('status', Game::STATUS_ENDED);
 
     $attributesResponse = $this->readAttributes($request, $query);
 
-    return $attributesResponse ?? GameResource::collection($query->get());
+    return $attributesResponse ?? GameResource::collection($query->paginate(10));
+  }
+
+  public function store(CreateGameRequest $request)
+  {
+    $game = new Game();
+    $game->fill($request->validated());
+    $game->status = Game::STATUS_PENDING;
+    $game->save();
+
+    return new GameResource($game);
+  }
+
+  public function update(UpdateGameRequest $request, Game $game)
+  {
+    if($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED)
+      return response()->json(['message' => 'Cant update ended or interrupted games'], 404);
+
+    $game->fill($request->validated());
+
+    $game->save();
+
+    return new GameResource($game);
   }
 
   private function readAttributes(Request $request, $query)
@@ -58,6 +82,6 @@ class GameController extends Controller
     
     $type = $request->query('type');
     if ($type != 'A')
-      $query->where('type', $type ?? 'S');
+      $query->where('type', $type ?? Game::TYPE_SINGLEPLAYER);
   }
 }
