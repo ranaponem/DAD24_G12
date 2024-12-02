@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\BoardController;
+use App\Http\Controllers\MultiplayerGamePlayedController;
 use App\Models\User;
 use App\Models\Game;
 
@@ -47,5 +49,17 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
     # Update partial
     Route::patch('/games/{game}', [GameController::class, 'update']);
+
+    # Get All
+    Route::get('/boards', [BoardController::class, 'index']);
+
+    # Get One
+    Route::get('/boards/{board}', [BoardController::class, 'show']);
+
+    # Get All
+    Route::get('/multiplayer', [MultiplayerGamePlayedController::class, 'index']);
+
+    # Get One
+    Route::get('/multiplayer/{multiplayer_game_played}', [MultiplayerGamePlayedController::class, 'show']);
 });
 

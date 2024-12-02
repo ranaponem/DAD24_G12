@@ -75,9 +75,9 @@ class GameController extends Controller
     if ($request->has('score_type')){
       
       if($request->query('score_type') === 'time')
-        $query->orderBy('total_time', 'asc');
+        $query->orderBy('total_time', 'asc')->orderBy('total_turns_winner', 'asc');
       else if($request->query('score_type') === 'turns')
-        $query->orderBy('total_turns_winner', 'asc');
+        $query->orderBy('total_turns_winner', 'asc')->orderBy('total_time', 'asc');
     }
     
     $type = $request->query('type');
