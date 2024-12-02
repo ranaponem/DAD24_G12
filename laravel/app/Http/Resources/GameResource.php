@@ -19,13 +19,14 @@ class GameResource extends JsonResource
         return [
             "id" => $this->id,
             "created_by" => new UserResource($this->creator),
-            "winned_by" => $this->winner ? new UserResource($this->winner) : null,
+            "won_by" => $this->winner ? new UserResource($this->winner) : null,
             "type" => $this->type,
             "status" => $this->status,
             "began_at" => $this->began_at,
             "ended_at" => $this->ended_at,
             "total_time" => $this->total_time,
             "board" => new BoardResource($this->board),
+            "total_turns" => $this->total_turns_winner
         ];
     }
 }

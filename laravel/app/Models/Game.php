@@ -10,6 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Game extends Model
 {
     use HasFactory;
+
+    public const TYPE_MULTIPLAYER = 'M'; 
+    public const TYPE_SINGLEPLAYER = 'S'; 
+    public const STATUS_ENDED = 'E';
+    public const STATUS_PENDING = 'PE'; 
+    public const STATUS_PROGRESS = 'PL'; 
+    public const STATUS_INTERRUPTED = 'I'; 
+
     /**
      * The attributes that are mass assignable.
      *
