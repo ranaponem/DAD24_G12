@@ -48,6 +48,7 @@ class UserController extends Controller
         if($user->photo_filename && Storage::fileExists(UserController::PHOTO_PATH . $user->photo_filename)) {
             Storage::delete(UserController::PHOTO_PATH . $user->photo_filename);
         }
+        $user->brain_coins_balance = 0;
         $user->delete();
 
         return response()->json(null, 204);

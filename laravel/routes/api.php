@@ -6,8 +6,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\BoardController;
 use App\Http\Controllers\MultiplayerGamePlayedController;
+use App\Http\Controllers\TransactionController;
 use App\Models\User;
-use App\Models\Game;
+use App\Models\Transaction;
 
 //Route::get('/user', function (Request $request) {
 //    return $request->user();
@@ -17,8 +18,6 @@ Route::post('/auth/login', [AuthController::class, "login"])->name('login');
 Route::post('/users', [UserController::class, 'store'])
     ->can('create', User::class);
 
-# Get All
-Route::get('/games', [GameController::class, 'index']);
 
 Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -30,16 +29,17 @@ Route::middleware(['auth:sanctum'])->group(function() {
         ->can('viewAny', User::class);
     # Get
     Route::get('/users/{user}', [UserController::class, 'show'])
-        ->can('create', User::class);
+        ->can('create', 'user');
     # Update complete 
     Route::put('/users/{user}', [UserController::class, 'update'])
-        ->can('update', User::class);
+        ->can('update', 'user');
     # Update partial
     Route::patch('/users/{user}', [UserController::class, 'update'])
-        ->can('update', User::class);
+        ->can('update', 'user');
     # Delete user
     Route::delete('/users/{user}', [UserController::class, 'delete'])
-        ->can('delete', User::class);
+        ->can('delete', 'user');
+
 
     # Get My
     Route::get('/games/my', [GameController::class, 'showMy']);
@@ -61,4 +61,21 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
     # Get One
     Route::get('/multiplayer/{multiplayer_game_played}', [MultiplayerGamePlayedController::class, 'show']);
+
+
+    # Get My
+    Route::get('/transactions/my', [TransactionController::class, 'showMy'])
+        ->can('my', Transaction::class);
+    # Get All
+    Route::get('/transactions', [TransactionController::class, 'index'])
+        ->can('viewAny', Transaction::class);
+    # Get
+    Route::get('/transactions/{transaction}', [TransactionController::class, 'show'])
+        ->can('view', 'transaction');
+    # Create transaction
+    Route::post('/transactions', [TransactionController::class, 'store'])
+        ->can('create', Transaction::class);
 });
+
+# Get All
+Route::get('/games', [GameController::class, 'index']);
