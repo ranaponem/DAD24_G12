@@ -65,7 +65,7 @@ class TransactionController extends Controller
             };
 
             $transaction->user_id = $user->id;
-            $transaction->transaction_datetime = Carbon::now();
+            $transaction->transaction_datetime = Carbon::now()->isoFormat("YYYY-mm-DD HH:MM:ss");
             $transaction->save();
 
             $user->brain_coins_balance += (int)$requestValidated['brain_coins'];

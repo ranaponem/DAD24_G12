@@ -47,11 +47,12 @@ class GameController extends Controller
   {
     $game = DB::transaction(function () use ($request) {
       $user = $request->user();
+      $time = Carbon::now()->isoFormat("YYYY-mm-DD HH:MM:ss");
 
       $game = new Game();
       $game->fill($request->validated());
       $game->created_user_id = $user->id;
-      $game->began_at = Carbon::now();
+      $game->began_at = $time;
       
       match ($game->type) {
         Game::TYPE_SINGLEPLAYER => $game->status = Game::STATUS_PROGRESS,
@@ -69,7 +70,7 @@ class GameController extends Controller
         $transaction->game_id = $game->id;
         $transaction->type = Transaction::TYPE_INTERNAL;
         $transaction->brain_coins = -1;
-        $transaction->transaction_datetime = Carbon::now();
+        $transaction->transaction_datetime = $time;
 
         $transaction->save();
 
