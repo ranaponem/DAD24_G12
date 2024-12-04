@@ -27,7 +27,8 @@ class UpdateGameRequest extends FormRequest
 
       if ($this->input("status") == "E") { 
         array_merge($rules, [
-          "total_time" => "required|numeric|min:0",
+          "total_time" => "required|decimal|min:0",
+          "total_turns_winner" => "required|numeric|min:1",
           "winner_user_id" => "numeric|exists:users,id",
         ]);
       }

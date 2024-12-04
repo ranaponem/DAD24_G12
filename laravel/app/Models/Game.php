@@ -31,6 +31,7 @@ class Game extends Model
         'began_at',
         'ended_at',
         'total_time',
+        'total_turns_winner',
         'board_id',
     ];
 
