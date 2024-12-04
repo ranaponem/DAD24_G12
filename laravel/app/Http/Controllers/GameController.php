@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GameTypeRequest;
+use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\Game;
 use App\Models\Board;
 use App\Http\Resources\GameResource;
 use App\Http\Requests\CreateGameRequest;
 use App\Http\Requests\UpdateGameRequest;
+use Carbon\Carbon;
 
 class GameController extends Controller
 {
@@ -42,10 +45,41 @@ class GameController extends Controller
 
   public function store(CreateGameRequest $request)
   {
-    $game = new Game();
-    $game->fill($request->validated());
-    $game->status = Game::STATUS_PENDING;
-    $game->save();
+    $game = DB::transaction(function () use ($request) {
+      $user = $request->user();
+
+      $game = new Game();
+      $game->fill($request->validated());
+      $game->created_user_id = $user->id;
+      $game->began_at = Carbon::now();
+      
+      match ($game->type) {
+        Game::TYPE_SINGLEPLAYER => $game->status = Game::STATUS_PROGRESS,
+        Game::TYPE_MULTIPLAYER => $game->status = Game::STATUS_PENDING,
+      };
+
+      $game->save();
+
+      if ($game->board_id != 1) {
+        if ($user->brain_coins_balance - 1 < 0)
+          throw new \Exception("Not enough coins in balance");
+
+        $transaction = new Transaction();
+        $transaction->user_id = $user->id;
+        $transaction->game_id = $game->id;
+        $transaction->type = Transaction::TYPE_INTERNAL;
+        $transaction->brain_coins = -1;
+        $transaction->transaction_datetime = Carbon::now();
+
+        $transaction->save();
+
+        $user->brain_coins_balance -= 1;
+                
+        $user->save();
+      }
+
+      return $game;
+    });
 
     return new GameResource($game);
   }
@@ -53,9 +87,17 @@ class GameController extends Controller
   public function update(UpdateGameRequest $request, Game $game)
   {
     if($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED)
-      return response()->json(['message' => 'Cant update ended or interrupted games'], 404);
+      return response()->json(['message' => 'Cannot update ended or interrupted games'], 400);
+
+    if($game->status == Game::STATUS_PROGRESS && $request->status == Game::STATUS_PENDING)
+      return response()->json(['message' => 'Cannot put a game in progress back to pending'], 400);
 
     $game->fill($request->validated());
+    $game->ended_at = Carbon::now();
+    
+    if ($game->type == Game::TYPE_MULTIPLAYER) {
+      $game->winner_user_id = $request->winner_user_id;
+    }
 
     $game->save();
 

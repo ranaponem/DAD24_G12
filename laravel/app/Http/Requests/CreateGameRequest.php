@@ -23,11 +23,6 @@ class CreateGameRequest extends FormRequest
   {
     return [
       'type' => 'required|string|in:S,M',
-      'created_user_id' => 'required|integer|exists:users,id',
-      'winner_user_id' => 'nullable|integer|exists:users,id',
-      'began_at' => 'nullable|date',
-      'ended_at' => 'nullable|date|after_or_equal:began_at',
-      'total_time' => 'nullable|numeric|min:0',
       'board_id' => 'required|integer|exists:boards,id',
     ];
   }
@@ -36,7 +31,6 @@ class CreateGameRequest extends FormRequest
   {
     return [
       'type.in' => 'The type must be either "S" (single-player) or "M" (multiplayer).',
-      'status.in' => 'The status must be one of: "PE", "PL", "E", or "I".',
     ];
 
   }
