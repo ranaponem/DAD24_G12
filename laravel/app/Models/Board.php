@@ -10,10 +10,10 @@ class Board extends Model
 {
   use HasFactory;
 
-    protected $fillable = [
-        'board_cols',
-        'board_rows',
-    ];
+  protected $fillable = [
+      'board_cols',
+      'board_rows',
+  ];
 
   public $timestamps = false;
 

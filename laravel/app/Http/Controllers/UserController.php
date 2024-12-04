@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreUpdateUserRequest;
+use App\Http\Resources\UserBalanceResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -17,11 +18,15 @@ class UserController extends Controller
     }
 
     public function index() {
-        return UserResource::collection(User::where('type', 'P')->get());
+        return UserResource::collection(User::where('type', 'P')->paginate(20));
     }
 
-    public function show(int $id) {
-        return new UserResource(User::find($id));
+    public function show(User $user) {
+        return new UserResource($user);
+    }
+
+    public function showMyBalance(Request $request) {
+        return new UserBalanceResource($request->user());
     }
 
     public function store(StoreUpdateUserRequest $request) {
@@ -65,4 +70,6 @@ class UserController extends Controller
 
         return $user;
     }
+
+
 }
