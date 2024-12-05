@@ -45,12 +45,18 @@ class GameController extends Controller
 
   public function store(CreateGameRequest $request)
   {
-    $game = DB::transaction(function () use ($request) {
-      $user = $request->user();
-      $time = Carbon::now()->isoFormat("YYYY-mm-DD HH:MM:ss");
+    $requestValidated = $request->validated();
+    $user = $request->user();
+    
+    if ($user->brain_coins_balance - 1 < 0)
+      return response()->json(['message' => 'Insufficient balance.'], 400);
+
+    $time = Carbon::now();
+    
+    $game = DB::transaction(function () use ($requestValidated, $user, $time) {
 
       $game = new Game();
-      $game->fill($request->validated());
+      $game->fill($requestValidated);
       $game->created_user_id = $user->id;
       $game->began_at = $time;
       
@@ -62,8 +68,6 @@ class GameController extends Controller
       $game->save();
 
       if ($game->board_id != 1) {
-        if ($user->brain_coins_balance - 1 < 0)
-          throw new \Exception("Not enough coins in balance");
 
         $transaction = new Transaction();
         $transaction->user_id = $user->id;
@@ -81,6 +85,8 @@ class GameController extends Controller
 
       return $game;
     });
+    
+    $game->began_at = $time->isoFormat("YYYY-mm-DD HH:MM:ss");
 
     return new GameResource($game);
   }

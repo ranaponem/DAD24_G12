@@ -9,6 +9,7 @@ use App\Models\Game;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Log;
 
 class TransactionController extends Controller
 {
@@ -46,8 +47,13 @@ class TransactionController extends Controller
     {   
         $user = $request->user();
         $requestValidated = $request->validated();
-        
-        $transaction = DB::transaction(function () use ($user, $requestValidated) {
+
+        $time = Carbon::now();
+
+        if ($user->brain_coins_balance + (int)$requestValidated['brain_coins'] < 0)
+            return response()->json(['message' => 'Insufficient balance.'], 400);
+
+        $transaction = DB::transaction(function () use ($user, $requestValidated, $time) {
             $transaction = new Transaction();
             $transaction->fill($requestValidated);
 
@@ -65,13 +71,17 @@ class TransactionController extends Controller
             };
 
             $transaction->user_id = $user->id;
-            $transaction->transaction_datetime = Carbon::now()->isoFormat("YYYY-mm-DD HH:MM:ss");
+            $transaction->transaction_datetime = $time;
             $transaction->save();
 
-            $user->brain_coins_balance += (int)$requestValidated['brain_coins'];
+            $user->brain_coins_balance += (int)$requestValidated['brain_coins']; 
+                            
             $user->save();
+
             return $transaction;
         });
+
+        $transaction->transaction_datetime = $time->isoFormat("YYYY-mm-DD HH:MM:ss");
 
         return new TransactionResource($transaction);
     }
