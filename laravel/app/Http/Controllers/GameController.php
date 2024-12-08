@@ -48,7 +48,7 @@ class GameController extends Controller
     $requestValidated = $request->validated();
     $user = $request->user();
     
-    if ($user->brain_coins_balance - 1 < 0)
+    if ($requestValidated['board_id'] != 1 && $user->brain_coins_balance - 1 < 0)
       return response()->json(['message' => 'Insufficient balance.'], 400);
 
     $time = Carbon::now();
