@@ -6,7 +6,8 @@ import ProfileMini from './components/profile/ProfileMini.vue'
 
 <template>
   <Toaster />
-  <div class="min-h-screen bg-gray-50">
+  <div class="min-h-screen bg-gray-50 flex flex-col">
+    <!-- Navbar -->
     <header class="bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <nav class="flex items-center justify-between h-16">
@@ -35,7 +36,8 @@ import ProfileMini from './components/profile/ProfileMini.vue'
       </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Main content section where RouterView renders -->
+    <main class="flex-grow">
       <RouterView />
     </main>
   </div>
