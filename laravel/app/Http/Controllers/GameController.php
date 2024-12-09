@@ -124,13 +124,15 @@ class GameController extends Controller
     if ($request->has('score_type')){
       
       if($request->query('score_type') === 'time')
-        $query->orderBy('total_time', 'asc')->orderBy('total_turns_winner', 'asc');
+        $query->orderBy('total_time', 'asc');
       else if($request->query('score_type') === 'turns')
-        $query->orderBy('total_turns_winner', 'asc')->orderBy('total_time', 'asc');
+        $query->orderBy('total_turns_winner', 'asc');
     }
     
     $type = $request->query('type');
     if ($type != 'A')
       $query->where('type', $type ?? Game::TYPE_SINGLEPLAYER);
+
+    $query->orderBy('ended_at', 'desc');
   }
 }
