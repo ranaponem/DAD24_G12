@@ -1,4 +1,4 @@
-import HomeComponent from '@/components/HomeComponent.vue'
+import DashboardComponent from '@/components/DashboardComponent.vue'
 import LaravelTester from '@/components/LaravelTester.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
 import { createRouter, createWebHistory } from 'vue-router'
@@ -9,7 +9,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeComponent
+      component: DashboardComponent
     },
     {
       path: '/testers',
