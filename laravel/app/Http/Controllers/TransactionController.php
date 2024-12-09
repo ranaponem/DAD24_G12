@@ -9,10 +9,14 @@ use App\Models\Game;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Log;
+use Illuminate\Support\Facades\Http;
 
 class TransactionController extends Controller
 {
+    //REMOVE BEFORE PRODUCTION
+    private bool $DEBUG = true;
+    private String $externalApp = "https://dad-202425-payments-api.vercel.app/api/debit";
+
     /**
      * Display a listing of the resource.
      */
@@ -53,13 +57,27 @@ class TransactionController extends Controller
         if ($user->brain_coins_balance + (int)$requestValidated['brain_coins'] < 0)
             return response()->json(['message' => 'Insufficient balance.'], 400);
 
+        if ($this->DEBUG && $requestValidated['type'] == Transaction::TYPE_PURCHASE) {
+            $response = Http::post($this->externalApp, [
+                'type' => $requestValidated['payment_type'],
+                'reference' => $requestValidated['payment_ref'],
+                'value' => $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO,
+            ]);
+
+            if ($response->clientError())
+                return response()->json(['message'=> $response->json()['message']],400);
+            
+            if ($response->serverError())
+                return response()->json(['message'=> 'Something went wrong when trying to reach the payment server', 500]);
+        }
+
         $transaction = DB::transaction(function () use ($user, $requestValidated, $time) {
             $transaction = new Transaction();
             $transaction->fill($requestValidated);
 
             switch ($requestValidated['type']) {
                 case Transaction::TYPE_PURCHASE:
-                    $transaction->euros = $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO;
+                    $transaction->euros = $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO;                    
                     break;
                 case Transaction::TYPE_INTERNAL:
                     $game = Game::where('id', $requestValidated['game_id'])->first();
@@ -101,6 +119,7 @@ class TransactionController extends Controller
                 return $query;
             });
         }
+
         return $query;
     }
 }

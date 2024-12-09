@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Middleware\CheckSanctumToken;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -46,14 +47,15 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Special Get (balance only)
     Route::get('/users/mybalance', [UserController::class, 'showMyBalance']);
 
-    # Update complete 
-    Route::put('/users/{user}', [UserController::class, 'update'])
-        ->can('update', 'user');
+    # Update my user 
+    Route::put('/users/me', [UserController::class, 'update']);
 
-    # Delete user
-    Route::delete('/users/{user}', [UserController::class, 'delete'])
-        ->can('delete', 'user');
+    # Update my password
+    Route::put('/users/updatepassword', [UserController::class, 'updatePassword']);
 
+    # Delete me
+    Route::delete('/users/me', [UserController::class, 'destroy'])
+        ->can('delete', User::class);
 
     
     # Get My
@@ -87,6 +89,19 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Create transaction
     Route::post('/transactions', [TransactionController::class, 'store'])
         ->can('create', Transaction::class);
+
+    # Create new admin
+    Route::post('/admins', [AdminController::class, 'store'])
+        ->can('admin-create');
+
+    # Update player blocked state
+    Route::put('/users/{user}/changeblock', [AdminController::class, 'updatePlayerState'])
+        ->can('player-block', 'user');
+
+    # Delete user
+    Route::delete('/users/{user}', [AdminController::class, 'destroy'])
+        ->can('admin-destroy', 'user');
+    
 });
 
 # Get All
