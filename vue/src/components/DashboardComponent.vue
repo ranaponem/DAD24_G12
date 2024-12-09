@@ -1,5 +1,9 @@
 <script setup>
 import Button from './ui/button/Button.vue';
+import { useAuthStore  } from '@/stores/auth.js';
+
+const storeAuth = useAuthStore()
+
 </script>
 
 <template>
@@ -29,6 +33,12 @@ import Button from './ui/button/Button.vue';
                 <button class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                     Scoreboards
                 </button>
+                <RouterLink class="w-full px-4 py-2 mt-6 text-white bg-primary
+                hover:bg-tertiary rounded-md focus:outline-none focus:ring-2
+                focus:ring-tertiary-light content-center" v-if="storeAuth.user
+                && storeAuth.userType == 'P'" :to="{name : 'coins'}">
+                    Buy Coins
+                </RouterLink>
             </div>
         </div>
     </div>

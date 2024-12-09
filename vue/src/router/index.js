@@ -2,6 +2,7 @@ import DashboardComponent from '@/components/DashboardComponent.vue'
 import LaravelTester from '@/components/LaravelTester.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
+import CoinsPage from '@/components/coins/CoinsPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -30,6 +31,11 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfilePage
+    },
+    {
+      path: '/coins',
+      name: 'coins',
+      component: CoinsPage
     }
   ]
 })
