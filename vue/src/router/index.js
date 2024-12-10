@@ -1,5 +1,6 @@
 import DashboardComponent from '@/components/DashboardComponent.vue'
 import LaravelTester from '@/components/LaravelTester.vue'
+import GamesHome from '@/components/games/GamesHome.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -23,6 +24,11 @@ const router = createRouter({
           component: WebSocketTester
         }
       ]
+    },
+    {
+      path: '/games',
+      name: 'games',
+      component: GamesHome
     }
   ]
 })

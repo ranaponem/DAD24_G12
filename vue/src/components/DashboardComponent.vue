@@ -22,9 +22,9 @@ import Button from './ui/button/Button.vue';
                     History
                 </button>
                 <!-- Center Button -->
-                <button class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                <RouterLink to="/games" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                     Select Game Mode
-                </button>
+                </RouterLink>
                 <!-- Right Button -->
                 <button class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                     Scoreboards
