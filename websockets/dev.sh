@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SESSION_NAME="vue-dev"
+SESSION_NAME="ws-dev"
 
 # Function to start the screen session
 start() {

@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\Http;
 class TransactionController extends Controller
 {
     //REMOVE BEFORE PRODUCTION
-    private bool $DEBUG = true;
-    private String $externalApp = "https://dad-202425-payments-api.vercel.app/api/debit";
+    private const DEBUG = false;
+    private const externalApp = "https://dad-202425-payments-api.vercel.app/api/debit";
+    private const websocket = "ws:/192.168.0.211:8086";
 
     /**
      * Display a listing of the resource.
@@ -57,8 +58,8 @@ class TransactionController extends Controller
         if ($user->brain_coins_balance + (int)$requestValidated['brain_coins'] < 0)
             return response()->json(['message' => 'Insufficient balance.'], 400);
 
-        if ($this->DEBUG && $requestValidated['type'] == Transaction::TYPE_PURCHASE) {
-            $response = Http::post($this->externalApp, [
+        if (TransactionController::DEBUG && $requestValidated['type'] == Transaction::TYPE_PURCHASE) {
+            $response = Http::post(TransactionController::externalApp, [
                 'type' => $requestValidated['payment_type'],
                 'reference' => $requestValidated['payment_ref'],
                 'value' => $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO,
@@ -78,6 +79,7 @@ class TransactionController extends Controller
             switch ($requestValidated['type']) {
                 case Transaction::TYPE_PURCHASE:
                     $transaction->euros = $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO;                    
+
                     break;
                 case Transaction::TYPE_INTERNAL:
                     $game = Game::where('id', $requestValidated['game_id'])->first();

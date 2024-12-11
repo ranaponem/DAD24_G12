@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { useErrorStore } from '@/stores/error'
@@ -6,6 +6,8 @@ import { useErrorStore } from '@/stores/error'
 import avatarNoneAssetURL from '@/assets/avatar-none.png'
 
 export const useAuthStore = defineStore('auth', () => {
+  const socket = inject('socket') 
+  
   const storeError = useErrorStore()
 
   const user = ref(null)
@@ -30,14 +32,10 @@ export const useAuthStore = defineStore('auth', () => {
     return user.value ? user.value.type : ''
   })
 
-  const userGender = computed(() => {
-    return user.value ? user.value.gender : ''
-  })
-
   const userPhotoUrl = computed(() => {
-    const photoFile = user.value ? (user.value.photoFilename ?? '') : ''
+    const photoFile = user.value ? (user.value.photo_filename ?? '') : ''
     if (photoFile) {
-      return axios.defaults.baseURL.replaceAll('/api', photoFile)
+      return axios.defaults.baseURL.replaceAll('/api', "/" + photoFile)
     }
     return avatarNoneAssetURL
   })
@@ -45,6 +43,8 @@ export const useAuthStore = defineStore('auth', () => {
   // This function is "private" - not exported by the store
   const clearUser = () => {
     resetIntervalToRefreshToken()
+    if (user.value)
+      socket.emit('logout', user.value)
     user.value = null
     axios.defaults.headers.common.Authorization = ''
   }
@@ -57,6 +57,7 @@ export const useAuthStore = defineStore('auth', () => {
       axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
       const responseUser = await axios.get('users/me')
       user.value = responseUser.data.data
+      socket.emit('login', user.value)
       repeatRefreshToken()
       return user.value
     } catch (e) {
@@ -86,6 +87,16 @@ export const useAuthStore = defineStore('auth', () => {
         'Authentication Error!'
       )
       return false
+    }
+  }
+
+  const deleteAccount = async (credentials) => {
+    try {
+        await axios.delete('users/me', { password: credentials })
+        clearUser()
+        return true
+    } catch (e) {
+        return e
     }
   }
 
@@ -131,9 +142,9 @@ export const useAuthStore = defineStore('auth', () => {
     userFirstLastName,
     userEmail,
     userType,
-    userGender,
     userPhotoUrl,
     login,
-    logout
+    logout,
+    deleteAccount
   }
 })

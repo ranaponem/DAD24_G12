@@ -1,5 +1,5 @@
 import DashboardComponent from '@/components/DashboardComponent.vue'
-import LaravelTester from '@/components/LaravelTester.vue'
+import LoginPage from '@/components/LoginPage.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
 import CoinsPage from '@/components/coins/CoinsPage.vue'
@@ -15,13 +15,13 @@ const router = createRouter({
       component: DashboardComponent
     },
     {
-      path: '/testers',
+      path: '/login',
+      name: 'login',
+      component: LoginPage
+    },
+    {
+      path: '/navbar',
       children: [
-        {
-          path: 'laravel',
-          name: 'login',
-          component: LaravelTester
-        },
         {
           path: 'websocket',
           component: WebSocketTester
