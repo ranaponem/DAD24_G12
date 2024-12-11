@@ -47,19 +47,19 @@ class GameController extends Controller
   {
     $requestValidated = $request->validated();
     $user = $request->user();
-    
-    if ($user->brain_coins_balance - 1 < 0)
+
+    if ($requestValidated['board_id'] != 1 && $user->brain_coins_balance - 1 < 0)
       return response()->json(['message' => 'Insufficient balance.'], 400);
 
     $time = Carbon::now();
-    
+
     $game = DB::transaction(function () use ($requestValidated, $user, $time) {
 
       $game = new Game();
       $game->fill($requestValidated);
       $game->created_user_id = $user->id;
       $game->began_at = $time;
-      
+
       match ($game->type) {
         Game::TYPE_SINGLEPLAYER => $game->status = Game::STATUS_PROGRESS,
         Game::TYPE_MULTIPLAYER => $game->status = Game::STATUS_PENDING,
@@ -79,13 +79,13 @@ class GameController extends Controller
         $transaction->save();
 
         $user->brain_coins_balance -= 1;
-                
+
         $user->save();
       }
 
       return $game;
     });
-    
+
     $game->began_at = $time->isoFormat("YYYY-mm-DD HH:MM:ss");
 
     return new GameResource($game);
@@ -99,10 +99,14 @@ class GameController extends Controller
     if($game->status == Game::STATUS_PROGRESS && $request->status == Game::STATUS_PENDING)
       return response()->json(['message' => 'Cannot put a game in progress back to pending'], 400);
 
-    $game->fill($request->validated());
+    $requestValidated = $request->validated();      
+    $game->fill($requestValidated);
     $game->ended_at = Carbon::now();
-    
+
     if ($game->type == Game::TYPE_MULTIPLAYER) {
+      if ($requestValidated['winner_user_id'] == null) {
+        return response()->json(['message'=> 'Multiplayer games need a winner.'], 400);
+      }
       $game->winner_user_id = $request->winner_user_id;
     }
 
