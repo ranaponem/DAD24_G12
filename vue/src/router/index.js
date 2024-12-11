@@ -54,8 +54,9 @@ router.beforeEach(async(to, from, next) => {
         next()
 
         else{
-                next({name : 'login'})
-                alert('You must be logged in to access this page!');
+                if(confirm('You must be logged in to access this page!')){
+                        next({name : 'login'})
+                }
         }
 }) 
 export default router
