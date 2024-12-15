@@ -17,7 +17,7 @@ spec:
       priorityClassName: low-priority
       containers:
         - name: web
-          image: registry.172.22.21.107.sslip.io/dad-group-12/ws:v1.0.3
+          image: registry.172.22.21.107.sslip.io/dad-group-12/ws:v1.0.0
           resources:
             requests:
               memory: "128Mi"
@@ -25,6 +25,7 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "200m"
+
 ---
 apiVersion: v1
 kind: Service

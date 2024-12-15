@@ -22,15 +22,16 @@ spec:
               value: "yes"
             - name: MYSQL_DATABASE
               value: "project"
-              ports:
-                - containerPort: 3306
-              resources:
-                requests:
-                  memory: "384Mi"
-                cpu: "200m"
-              limits:
-                memory: "1Gi"
-                cpu: "500m"
+          ports:
+            - containerPort: 3306
+          resources:
+            requests:
+              memory: "384Mi"
+              cpu: "200m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+
 ---
 apiVersion: v1
 kind: Service
