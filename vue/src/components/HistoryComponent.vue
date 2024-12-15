@@ -5,12 +5,21 @@ import { useGamesStore } from '@/stores/games';
 const gamesStore = useGamesStore();
 
 const pageNum = ref(1);
+const totalPages = ref(1);
 
-const totalPages = ref(1); 
+const fetchHistory = async () => {
+        try {
+                await gamesStore.getHistory(pageNum.value);
 
-const fetchHistory = async() => {
-    gamesStore.getHistory(pageNum.value);
-    totalPages.value = gamesStore.meta.data.meta.last_page
+                if (gamesStore.meta?.data?.meta?.last_page) {
+                        totalPages.value = gamesStore.meta.data.meta.last_page;
+                } else {
+                        console.warn("Meta data not found or is undefined");
+                        totalPages.value = 1;
+                }
+        } catch (error) {
+                console.error("Error fetching history:", error);
+        }
 };
 
 // Utility function to get board type
@@ -49,21 +58,20 @@ const formatDate = (dateString) => {
 let debounceTimeout = null;
 
 const handlePageChange = () => {
-    clearTimeout(debounceTimeout); // Clear the previous timeout
-    debounceTimeout = setTimeout(() => {
-        if (pageNum.value < 1) {
-            pageNum.value = 1;
-        } else if (pageNum.value > totalPages.value) {
-            pageNum.value = totalPages.value;
-        }
-        fetchHistory();
-    }, 700); // 300ms debounce time
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => {
+                if (pageNum.value < 1) {
+                        pageNum.value = 1;
+                } else if (pageNum.value > totalPages.value) {
+                        pageNum.value = totalPages.value;
+                }
+                fetchHistory();
+        }, 700);
 };
 
 onMounted(() => {
-        fetchHistory();
+        fetchHistory(); // Fetch data on page load
 });
-//console.log(gamesStore.meta.data.meta.last_page)
 
 </script>
 
