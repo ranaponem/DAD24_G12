@@ -2,6 +2,7 @@
 import { useAuthStore } from "@/stores/auth"
 import { ref } from "vue"
 import ProfileLabel from "./ProfileLabel.vue"
+import CoinsCard from "@/components/coins/CoinsCard.vue"
     
 const storeAuth = useAuthStore()
 
@@ -14,10 +15,13 @@ const password = ref({
 
 const update = false
 
+const coins = ref(10)
+
 </script>
 
 <template>
-    <div class="max-w-5xl mx-auto p-8">
+  <div class="flex flex-row items-center justify-content">
+    <div class="w-3/5 mx-auto p-8">
         <div
             class="border-secondary-dark dark:border-secondary-light border-2 bg-gray-200 dark:bg-gray-700 shadow-lg rounded-lg overflow-hidden">
             <div class="flex flex-col items-center bg-gray-400 dark:bg-primary-dark py-6 px-32 space-y-3">
@@ -52,4 +56,6 @@ const update = false
             </form>
         </div>
     </div>
+    <CoinsCard/>
+  </div>
 </template>
