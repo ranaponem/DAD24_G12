@@ -11,15 +11,22 @@ export const useGamesStore = defineStore('games', () => {
         const allGames = ref([]) 
         const meta = ref({})
 
-        const getHistory = async(pageNum) => {
-                const params = new URLSearchParams([['page', pageNum]])
-                try{
-                        const responseMyGames = await axios.get('/games/my', { params })
+        const getHistory = async (pageNum, board) => {
+                let params = new URLSearchParams(); // Declare params outside of the block
+
+                if (board === "ALL") {
+                        params.append('page', pageNum); // Add only the page parameter
+                } else {
+                        params.append('page', pageNum);
+                        params.append('board', board); // Add both page and board parameters
+                }
+
+                try {
+                        const responseMyGames = await axios.get('/games/my', { params });
                         myGames.value = responseMyGames.data.data;
                         meta.value = responseMyGames;
                         return myGames.value;
-                }
-                catch (e) {
+                } catch (e) {
                         storeError.setErrorMessages(
                                 e.response.data.message,
                                 e.response.data.errors,
@@ -30,54 +37,51 @@ export const useGamesStore = defineStore('games', () => {
                 }
         };
 
-        const getScoreboard = async(sorting, board, scope) => {
-                let params;
+const getScoreboard = async (sorting, board, scope) => {
+    let params = new URLSearchParams(); // Declare params outside
 
-                if(scope == "GLOBAL"){
-                        if(board == "ALL"){
-                                params = new URLSearchParams([['score_type', sorting]])
-                        }else{
+    if (scope === "GLOBAL") {
+        params.append('score_type', sorting); // Always include score_type
 
-                                params = new URLSearchParams([['score_type', sorting],['board', board]])
-                        }
-                        try{
-                                const responseAllGames = await axios.get('/games', { params })
-                                allGames.value = responseAllGames.data.data;
-                                return allGames.value;
-                        }
-                        catch (e) {
-                                storeError.setErrorMessages(
-                                        e.response.data.message,
-                                        e.response.data.errors,
-                                        e.response.status,
-                                        'Error fetching Scoreboard'
-                                );
-                                return [];
-                        }
-                }
-                else if(scope == "PERSONAL"){
-                        if(board == "ALL"){
-                                params = new URLSearchParams([['score_type', sorting]])
-                        }else{
+        if (board !== "ALL") {
+            params.append('board', board); // Add board filter if it's not "ALL"
+        }
 
-                                params = new URLSearchParams([['score_type', sorting],['board', board]])
-                        }
-                        try{
-                                const responseAllGames = await axios.get('/games/my', { params })
-                                allGames.value = responseAllGames.data.data;
-                                return allGames.value;
-                        }
-                        catch (e) {
-                                storeError.setErrorMessages(
-                                        e.response.data.message,
-                                        e.response.data.errors,
-                                        e.response.status,
-                                        'Error fetching Scoreboard'
-                                );
-                                return [];
-                        }
-                }
-        };
+        try {
+            const responseAllGames = await axios.get('/games', { params });
+            allGames.value = responseAllGames.data.data;
+            return allGames.value;
+        } catch (e) {
+            storeError.setErrorMessages(
+                e.response.data.message,
+                e.response.data.errors,
+                e.response.status,
+                'Error fetching Scoreboard'
+            );
+            return [];
+        }
+    } else if (scope === "PERSONAL") {
+        params.append('score_type', sorting); // Always include score_type
+
+        if (board !== "ALL") {
+            params.append('board', board); // Add board filter if it's not "ALL"
+        }
+
+        try {
+            const responseAllGames = await axios.get('/games/my', { params });
+            allGames.value = responseAllGames.data.data;
+            return allGames.value;
+        } catch (e) {
+            storeError.setErrorMessages(
+                e.response.data.message,
+                e.response.data.errors,
+                e.response.status,
+                'Error fetching Scoreboard'
+            );
+            return [];
+        }
+    }
+};
 
         return { myGames, meta, getHistory, getScoreboard };
 })

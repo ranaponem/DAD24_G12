@@ -1,15 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useGamesStore } from '@/stores/games';
 
 const gamesStore = useGamesStore();
 
+const selectedBoard = ref('ALL'); 
 const pageNum = ref(1);
 const totalPages = ref(1);
 
 const fetchHistory = async () => {
         try {
-                await gamesStore.getHistory(pageNum.value);
+                await gamesStore.getHistory(pageNum.value, selectedBoard.value);
 
                 if (gamesStore.meta?.data?.meta?.last_page) {
                         totalPages.value = gamesStore.meta.data.meta.last_page;
@@ -69,6 +70,11 @@ const handlePageChange = () => {
         }, 700);
 };
 
+watch(selectedBoard, () => {
+  console.log("Selected board changed to:", selectedBoard.value); // Debugging
+  fetchHistory();
+});
+
 onMounted(() => {
         fetchHistory(); // Fetch data on page load
 });
@@ -81,6 +87,19 @@ onMounted(() => {
                         My Game History
                 </h1>
 
+                        <div class="bg-white p-4 mb-4 mr-4 flex items-center space-x-2 rounded-3xl border-2 border-primary justify-center">
+                                <label for="boardType" class="text-lg font-bold text-gray-700 mr-2">Filter by Board Type:</label>
+                                <select
+                                        id="boardType"
+                                        v-model="selectedBoard"
+                                        class="p-2 border rounded-lg bg-white shadow-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+                                >
+                                        <option value="ALL">ALL</option>
+                                        <option value="3x4">3x4</option>
+                                        <option value="4x4">4x4</option>
+                                        <option value="6x6">6x6</option>
+                                </select>
+                        </div>
                 <div class="flex items-center justify-center w-full">
                         <table class="table-auto border-collapse w-3/4 text-center rounded-lg overflow-hidden">
                                 <thead>
