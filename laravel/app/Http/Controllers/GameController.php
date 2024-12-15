@@ -113,6 +113,7 @@ class GameController extends Controller
 
   private function readAttributes(Request $request, $query)
   {    
+    // Filter by board
     if($request->has('board')){
       $board_size = explode("x",$request->query('board'));
       $board = Board::where('board_cols', $board_size[0])->where('board_rows', $board_size[1])->first();
@@ -121,16 +122,48 @@ class GameController extends Controller
       $query->where('board_id', $board->id);
     }
 
+    // Order by either number of turns or time taken (score)
+    $isOrderedByScore = false;
     if ($request->has('score_type')){
-      
-      if($request->query('score_type') === 'time')
-        $query->orderBy('total_time', 'asc')->orderBy('total_turns_winner', 'asc');
-      else if($request->query('score_type') === 'turns')
-        $query->orderBy('total_turns_winner', 'asc')->orderBy('total_time', 'asc');
+      if($request->query('score_type') === 'time'){
+        $query->orderBy('total_time', 'asc');
+        $isOrderedByScore = true;
+      }
+      else if($request->query('score_type') === 'turns'){
+        $query->orderBy('total_turns_winner', 'asc');
+        $isOrderedByScore = true;
+      }
     }
-    
+
+    // Filter by type, defaults to singleplayer
     $type = $request->query('type');
     if ($type != 'A')
       $query->where('type', $type ?? Game::TYPE_SINGLEPLAYER);
+
+    // Filter by a start date (all games played after it are gotten)
+    if($request->has('date_start')){
+      $dateStart = $request->query('date_start');
+      $parsedDateStart = \DateTime::createFromFormat('d-m-Y', $dateStart);
+
+      if($parsedDateStart)
+          $query->where('ended_at', '>=', $parsedDateStart->format('Y-m-d'));
+
+      else
+        return response()->json(['message' => 'Invalid \'date_start\' date format: must be DD-mm-YYYY'], 402);
+    }
+
+    // Filter by end date (all games played before it are gotten)
+    if($request->has('date_end')){
+      $dateEnd = $request->query('date_end');
+      $parsedDateEnd = \DateTime::createFromFormat('d-m-Y', $dateEnd);
+
+      if($parsedDateEnd)
+        $query->where('ended_at', '<=', $parsedDateEnd->format('Y-m-d').' 23:59:59');
+
+      else
+        return response()->json(['message' => 'Invalid \'date_end\' date format: must be DD-mm-YYYY'], 402);
+    }
+    // Ordering by most recent or by oldest if score ordering was parsed
+    $query->orderBy('ended_at', $isOrderedByScore ? 'asc' : 'desc');
   }
 }
