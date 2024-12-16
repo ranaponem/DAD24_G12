@@ -2,6 +2,7 @@ import DashboardComponent from '@/components/DashboardComponent.vue'
 import LaravelTester from '@/components/LaravelTester.vue'
 import GamesHome from '@/components/games/GamesHome.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
+import MemoryGame from '@/components/games/MemoryGame.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -29,7 +30,17 @@ const router = createRouter({
       path: '/games',
       name: 'games',
       component: GamesHome
+    },
+    {
+      path: '/games/play',
+      name: 'MemoryGame',
+      props: route => ({
+        rows: parseInt(route.params.rows),
+        cols: parseInt(route.params.cols),
+      }),
+      component: MemoryGame,
     }
+    
   ]
 })
 
