@@ -101,6 +101,12 @@ class TransactionController extends Controller
                 return $query;
             });
         }
+        if ($request->nickname){
+            $nickname = $request->nickname;
+            $query->with('user')->whereHas('user', function($query) use ($nickname) {
+                $query->where('nickname', 'LIKE', '%' . $nickname . '%');
+            });
+        }
         $query->orderBy('transaction_datetime', 'desc');
         return $query;
     }
