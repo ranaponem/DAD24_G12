@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   const user = ref(null)
   const token = ref('')
+  const balance = ref(null)
 
   const userName = computed(() => {
     return user.value ? user.value.name : ''
@@ -28,6 +29,9 @@ export const useAuthStore = defineStore('auth', () => {
     return user.value ? user.value.email : ''
   })
 
+  const userCoins = computed(() => {
+    return user.value ? user.value.brain_coins_balance: ''
+  })
   const userType = computed(() => {
     return user.value ? user.value.type : ''
   })
@@ -57,7 +61,8 @@ export const useAuthStore = defineStore('auth', () => {
       axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
       const responseUser = await axios.get('users/me')
       user.value = responseUser.data.data
-      socket.emit('login', user.value)
+      const responseCoins = await axios.get('users/mybalance')
+      balance.value = responseCoins.data.brain_coins_balance
       repeatRefreshToken()
       return user.value
     } catch (e) {
@@ -138,11 +143,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user,
+    balance,
     userName,
     userFirstLastName,
     userEmail,
     userType,
     userPhotoUrl,
+    userCoins,
     login,
     logout,
     deleteAccount

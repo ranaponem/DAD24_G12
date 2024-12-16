@@ -31,11 +31,6 @@ const router = createRouter({
       path: '/profile',
       name: 'profile',
       component: ProfilePage
-    },
-    {
-      path: '/coins',
-      name: 'coins',
-      component: CoinsPage
     }
   ]
 })

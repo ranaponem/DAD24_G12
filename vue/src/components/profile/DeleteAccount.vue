@@ -40,7 +40,7 @@ onMounted(() => {
         <div class="items-center flex flex-col py-4">
             <button @click.prevent="modalAppear"
                 class="text-lg font-semibold rounded-2xl bg-red-700 hover:bg-red-800 border-2 border-secondary-dark px-6 py-2">
-                Delete {{ storeError.fieldMessage('password') }} {{ storeProfile.temp }}
+                Delete
             </button>
         </div>
         <form v-show="deleteModalStatus > 0"
