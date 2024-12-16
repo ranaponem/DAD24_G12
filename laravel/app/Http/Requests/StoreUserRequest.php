@@ -3,10 +3,10 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
-class StoreUpdateUserRequest extends FormRequest
+class StoreUserRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,10 @@ class StoreUpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name"=> "string|min:3|max:255",
-            "email"=> ["email", "min:3","max:255",Rule::unique('users', 'email')->ignore(auth()->user()->id)],
-            "nickname"=> ["string","min:4","max:20",Rule::unique('users', 'nickname')->ignore(auth()->user()->id)],
+            "name"=> "required|string|min:3|max:255",
+            "email"=> ["required", "email", "min:3","max:255",Rule::unique('users', 'email')->ignore(auth()->user()->id)],
+            "nickname"=> ["required","string","min:4","max:20",Rule::unique('users', 'nickname')->ignore(auth()->user()->id)], 
+            "password"=> ["required","string", Password::min(8)->letters()->numbers(), "confirmed"],
             "photo_image"=> "sometimes|image|mimes:jpeg,jpg,png|max:4096",
         ];
     }

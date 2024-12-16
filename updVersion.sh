@@ -104,18 +104,18 @@ NEW_VERSION="$MAJOR.$MINOR.$PATCH"
 if [[ -f $MAKEFILE ]]; then
     case "$TO_CHANGE" in
         "L")
-            sed -i "s/VERSION_LARAVEL := .*/VERSION_LARAVEL := \"$NEW_VERSION\"/" "$MAKEFILE"
+            sed -i "s/VERSION_LARAVEL := .*/VERSION_LARAVEL := $NEW_VERSION/" "$MAKEFILE"
             ;;
         "V")
-            sed -i "s/VERSION_VUE := .*/VERSION_VUE := \"$NEW_VERSION\"/" "$MAKEFILE"
+            sed -i "s/VERSION_VUE := .*/VERSION_VUE := $NEW_VERSION/" "$MAKEFILE"
             ;;
         "W")
-            sed -i "s/VERSION_WS := .*/VERSION_WS := \"$NEW_VERSION\"/" "$MAKEFILE"
+            sed -i "s/VERSION_WS := .*/VERSION_WS := $NEW_VERSION/" "$MAKEFILE"
             ;;
         "A")
-            sed -i "s/VERSION_LARAVEL := .*/VERSION_LARAVEL := \"$NEW_VERSION\"/" "$MAKEFILE"
-            sed -i "s/VERSION_VUE := .*/VERSION_VUE := \"$NEW_VERSION\"/" "$MAKEFILE"
-            sed -i "s/VERSION_WS := .*/VERSION_WS := \"$NEW_VERSION\"/" "$MAKEFILE"
+            sed -i "s/VERSION_LARAVEL := .*/VERSION_LARAVEL := $NEW_VERSION/" "$MAKEFILE"
+            sed -i "s/VERSION_VUE := .*/VERSION_VUE := $NEW_VERSION/" "$MAKEFILE"
+            sed -i "s/VERSION_WS := .*/VERSION_WS := $NEW_VERSION/" "$MAKEFILE"
             ;;
     esac
 fi
