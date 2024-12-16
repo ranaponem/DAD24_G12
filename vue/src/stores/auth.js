@@ -12,7 +12,6 @@ export const useAuthStore = defineStore('auth', () => {
 
   const user = ref(null)
   const token = ref('')
-  const balance = ref(null)
 
   const userName = computed(() => {
     return user.value ? user.value.name : ''
@@ -29,9 +28,6 @@ export const useAuthStore = defineStore('auth', () => {
     return user.value ? user.value.email : ''
   })
 
-  const userCoins = computed(() => {
-    return user.value ? user.value.brain_coins_balance: ''
-  })
   const userType = computed(() => {
     return user.value ? user.value.type : ''
   })
@@ -43,6 +39,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
     return avatarNoneAssetURL
   })
+
+  const userBalance = async () => {
+    try{
+      const responseCoins = await axios.get('users/mybalance')
+      const balance = ref(responseCoins.data.brain_coins_balance)
+      return balance.value
+    }
+    catch(e){
+      storeError.setErrorMessages(
+        e.response.data.message,
+        e.response.data.errors,
+        e.response.status,
+        'Balance Error!'
+      )
+      return false
+    }
+  }
 
   // This function is "private" - not exported by the store
   const clearUser = () => {
@@ -61,8 +74,6 @@ export const useAuthStore = defineStore('auth', () => {
       axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
       const responseUser = await axios.get('users/me')
       user.value = responseUser.data.data
-      const responseCoins = await axios.get('users/mybalance')
-      balance.value = responseCoins.data.brain_coins_balance
       repeatRefreshToken()
       return user.value
     } catch (e) {
@@ -143,13 +154,12 @@ export const useAuthStore = defineStore('auth', () => {
 
   return {
     user,
-    balance,
     userName,
     userFirstLastName,
     userEmail,
     userType,
     userPhotoUrl,
-    userCoins,
+    userBalance,
     login,
     logout,
     deleteAccount

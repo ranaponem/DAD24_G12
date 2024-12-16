@@ -2,19 +2,13 @@ import { computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useErrorStore } from '@/stores/error'
 import axios from 'axios'
-import { useAuthStore } from '@/stores/auth'
 
 export const useCoinsStore = defineStore('coins', () => {
   const storeError = useErrorStore()
-  const storeAuth = useAuthStore()
 
-  const myBalance = computed(()=>{
-    return storeAuth.balance ?? 0
-  })
-
-  const buyCoins = async (quantity, reference, paymentType) => {
+  const buyCoins = async (body) => {
     try{
-      const response = await axios.post('transactions', {brain_coins: quantity , type: 'P', payment_type: paymentType, payment_ref: reference})
+      const response = await axios.post('transactions', body)
     }
     catch{
       storeError.setErrorMessages(
@@ -28,7 +22,6 @@ export const useCoinsStore = defineStore('coins', () => {
   }
 
   return {
-    buyCoins,
-    myBalance
+    buyCoins
   }
 })

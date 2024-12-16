@@ -1,8 +1,9 @@
 <script setup>
   import { useCoinsStore } from '@/stores/coins'
-  import { ref } from 'vue';
+  import { useAuthStore } from '@/stores/auth'
+  import { ref, onMounted } from 'vue';
 
-  const coinsQuantity = ref(10);
+  const coinsQuantity = ref(0);
   const price = ref(coinsQuantity.value / 10);
   const reference = ref(null);
   const paymentMethod = ref("MBWAY");
@@ -34,6 +35,31 @@
   }
 
   const storeCoins = useCoinsStore()
+  const storeAuth = useAuthStore()
+
+  const userBalance = ref(0) // Ref to hold the resolved balance
+
+  const fetchUserBalance = async () => {
+    const balance = await storeAuth.userBalance() // Await the resolved balance
+    if (balance !== false) {
+      userBalance.value = balance
+    }
+  }
+
+  // Fetch the balance when the component is mounted
+  onMounted(() => {
+    fetchUserBalance()
+  })
+
+  const buyCoinsButton = async () => {
+    await storeCoins.buyCoins({brain_coins: coinsQuantity.value,
+                        type: 'P',
+                        payment_type: paymentMethod.value,
+                        payment_ref: reference.value
+                      })
+    fetchUserBalance()
+  }
+
 </script>
 <template>
   <div class="w-full h-full border-secondary-dark dark:border-secondary-light
@@ -48,71 +74,61 @@
     <div class="border-2
     border-gray-900
     dark:border-gray-100" />
-        <div class="flex flex-col items-center bg-white shadow-lg p-6 rounded-lg">
-          <div class="text-3xl mb-12 font-semibold text-gray-700">
-            Balance: {{ storeCoins.myBalance }} BC
-          </div>
-          <div class="mb-8 text-xl font-semibold text-gray-700">
-            Purchase more coins!
-          </div>
-          <div class="flex flex-row justify-center space-x-4">
-            <button @click="decrease" class="bg-primary text-white w-10 px-4
-            py-2 rounded hover:bg-primary-dark focus:outline-none">
-              -
-            </button>
-            <input
-              type="number"
-              v-model.coinsQuantity="coinsQuantity"
-              @blur="validateInput"
-              class="w-20 text-center text-2xl font-bold
-              bg-gray-200 rounded-lg shadow-inner
-              focus:outline-none focus:ring-2
-              focus:ring-blue-400"
-              />
-            <button @click="increase" class="bg-primary text-white w-10 px-4
-            py-2 rounded hover:bg-primary-dark focus:outline-none">
-              +
-            </button>
-          </div>
-          <div class="mt-6 w-full">
-            <label for="payment-method" class="block mb-2 text-gray-600
-            font-medium">Select Payment Method:</label>
-            <select id="payment-method" v-model="paymentMethod"
-                                        class="w-full p-2 border rounded-lg shadow-sm
-                                        focus:outline-none focus:ring-2 focus:ring-blue-400">
-              <option value="MBWAY" selected>MBWAY</option>
-              <option value="PAYPAL">PAYPAL</option>
-              <option
-                value="IBAN">IBAN</option>
-              <option
-                value="MB">MB</option>
-              <option
-                value="VISA">VISA</option>
-            </select>
-          </div>
-
-          <!-- Textbox for reference -->
-          <div class="mt-4 w-full">
-            <label for="reference" class="block mb-2 text-gray-600
-            font-medium">Reference:</label>
-            <input
-              type="number"
-              id="reference"
-              v-model="reference"
-              placeholder="Enter reference here"
-              class="w-full p-2
-              border rounded-lg
-              shadow-sm
-              focus:outline-none
-              focus:ring-2
-              focus:ring-blue-400"
-              />
-          </div>
-          <button v-if="coinsQuantity > 0" class="mt-8 bg-primary-light hover:bg-primary focus:outline-none
-          px-4 py-2 rounded text-xl font-semibold text-white">
-          Buy for {{ price.toFixed(2)  }}€
+      <div class="flex flex-col items-center bg-white shadow-lg p-6 rounded-lg">
+        <div class="text-3xl mb-12 font-semibold text-gray-700">
+          Balance: {{ userBalance }} BC
+        </div>
+        <div class="mb-8 text-xl font-semibold text-gray-700">
+          Purchase more coins!
+        </div>
+        <div class="flex flex-row justify-center space-x-4">
+          <button @click="decrease" 
+            class="text-lg font-semibold rounded-2xl bg-cyan-600 hover:bg-cyan-800 border-2 border-secondary-dark px-6 py-2">
+            -
+          </button>
+          <input
+            type="number"
+            v-model.coinsQuantity="coinsQuantity"
+            @blur="validateInput"
+            class="w-20 text-center text-2xl font-bold
+            bg-gray-200 rounded-lg shadow-inner
+            focus:outline-none focus:ring-2
+            focus:ring-blue-400 border-secondary-dark border-2"
+            />
+          <button @click="increase" 
+            class="text-lg font-semibold rounded-2xl bg-cyan-600 hover:bg-cyan-800 border-2 border-secondary-dark px-6 py-2">
+            +
           </button>
         </div>
+        <div v-if="coinsQuantity > 0" class="flex flex-col mt-6 gap-2 self-stretch">
+          <label class="text-sm text-gray-500 dark:text-gray-300">Payment
+            Type</label>
+          <select id="payment-method" v-model="paymentMethod"
+                                      class="w-full px-2 py-1 text-md rounded-lg border-secondary-dark
+                                      dark:border-secondary-light border-2">
+            <option value="MBWAY" selected>MBWAY</option>
+            <option value="PAYPAL">PAYPAL</option>
+            <option
+              value="IBAN">IBAN</option>
+            <option
+              value="MB">MB</option>
+            <option
+              value="VISA">VISA</option>
+          </select>
+        </div>
+
+        <div v-if="coinsQuantity > 0" class="flex flex-col gap-2 self-stretch
+        mt-4">
+        <label class="text-sm text-gray-500 dark:text-gray-300">Reference</label>
+        <input type="text" class="px-2 py-1 text-md rounded-lg border-secondary-dark dark:border-secondary-light border-2" 
+                           placeholder="Enter reference here" v-model="reference" />
+        </div>
+
+        <button @click.prevent="buyCoinsButton" v-if="coinsQuantity > 0"
+                                                class="mt-5 text-lg font-semibold rounded-2xl bg-cyan-600 hover:bg-cyan-800 border-2 border-secondary-dark px-6 py-2">
+                                                Buy for {{ price.toFixed(2)  }}€
+        </button>
+      </div>
     </div>
 </template>
 <style>
