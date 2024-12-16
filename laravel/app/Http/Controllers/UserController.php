@@ -12,10 +12,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    private const PHOTO_PATH = 'public/photos/'; 
+    private const PHOTO_PATH = 'public/photos/';
 
     public function showMe(Request $request) {
         return new UserResource($request->user());
@@ -44,7 +45,7 @@ class UserController extends Controller
             $user->blocked = User::UNBLOCKED;
             $user->brain_coins_balance = 0;
             $user->save();
-            
+
             if($request->hasFile('photo')) {
                 $path = $request->photo_image->store(UserController::PHOTO_PATH);
                 $user->photo_filename = basename($path);
@@ -57,7 +58,7 @@ class UserController extends Controller
             $transaction->type = Transaction::TYPE_BONUS;
             $transaction->brain_coins = 10;
 
-            $transaction->save();            
+            $transaction->save();
 
             $user->brain_coins_balance =+ 10;
             $user->save();
@@ -66,7 +67,7 @@ class UserController extends Controller
         });
 
         if ($user == null)
-            response()->json(["message" => "Something went wrong when creating the user"],500);
+            response()->json(["message" => "Something went wrong when creating the user"], 500);
 
         return new UserResource($user);
     }
@@ -88,16 +89,23 @@ class UserController extends Controller
 
         return new UserResource($user);
     }
-    
+
     public function updatePassword(Request $request) {
         $user = $request->user();
 
-        $request->validateWithBag('userDeletion', [
+        $validator = Validator::make($request->all(), [
             'old_password' => ['required','string','current_password'],
             "password"=> ["required","string", Password::min(8)->letters()->numbers(), "confirmed"],
         ]);
-        
-        $user->fill($request->validated());
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Given data is invalid',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $user->fill($request->all());
         $user->save();
 
         return response()->json($user,200);
@@ -106,9 +114,16 @@ class UserController extends Controller
     public function destroy(Request $request) {
         $user = $request->user();
 
-        $request->validateWithBag('userDeletion', [
+        $validator = Validator::make($request->all(), [
             'password' => ['required','string','current_password'],
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Password verification required',
+                'errors' => $validator->errors()
+            ], 422);
+        }
 
         $photo = $user->photo_filename;
 
@@ -117,7 +132,7 @@ class UserController extends Controller
             $user->delete();
         } else {
             DB::transaction(function () use ($user) {
-                if (count($user->transactions) == 1) {    
+                if (count($user->transactions) == 1) {
                     $user->transactions->first()->delete();
                 }
                 $user->forceDelete();
