@@ -39,12 +39,12 @@ class TransactionController extends Controller
     {
         return new TransactionResource($transaction);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreTransactionRequest $request)
-    {   
+    {
         $user = $request->user();
         $requestValidated = $request->validated();
 
@@ -74,8 +74,8 @@ class TransactionController extends Controller
             $transaction->transaction_datetime = $time;
             $transaction->save();
 
-            $user->brain_coins_balance += (int)$requestValidated['brain_coins']; 
-                            
+            $user->brain_coins_balance += (int)$requestValidated['brain_coins'];
+
             $user->save();
 
             return $transaction;
@@ -101,6 +101,7 @@ class TransactionController extends Controller
                 return $query;
             });
         }
+        $query->orderBy('transaction_datetime', 'desc');
         return $query;
     }
 }

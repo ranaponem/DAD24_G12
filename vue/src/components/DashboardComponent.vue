@@ -15,6 +15,10 @@ const goToScoreboard = () => {
         router.push('/scoreboard');
 };
 
+const goToTransactions = () => {
+        router.push('/transactions');
+};
+
 </script>
 
 <template>
@@ -43,6 +47,9 @@ const goToScoreboard = () => {
                                 <!-- Right Button -->
                                 <button @click="goToScoreboard" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                                         Scoreboard
+                                </button>
+                                <button @click="goToTransactions" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                        Transactions
                                 </button>
                         </div>
                 </div>

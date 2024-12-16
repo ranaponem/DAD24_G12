@@ -1,6 +1,7 @@
 import DashboardComponent from '@/components/DashboardComponent.vue'
 import HistoryComponent from '@/components/HistoryComponent.vue'
 import ScoreboardComponent from '@/components/ScoreboardComponent.vue'
+import TransactionsComponent from '@/components/TransactionsComponent.vue'
 import LaravelTester from '@/components/LaravelTester.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
@@ -43,7 +44,13 @@ const router = createRouter({
                         path: '/scoreboard',
                         name: 'scoreboard',
                         component: ScoreboardComponent
+                },
+                {
+                        path: '/transactions',
+                        name: 'transactions',
+                        component: TransactionsComponent
                 }
+
         ]
 })
 router.beforeEach(async(to, from, next) => {
