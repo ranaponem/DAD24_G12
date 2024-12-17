@@ -15,6 +15,10 @@ export const useMemoryGameStore = defineStore('memory', () => {
   const NO_CARD = -1;
   const game = ref([]);
   const gameType = ref(null)
+  const realTime = ref({
+    startTime: null,
+    endTime: null
+  })
 
   const flippedCards = ref([]);
   const canFlip = ref(true);
@@ -56,6 +60,7 @@ export const useMemoryGameStore = defineStore('memory', () => {
   };
 
   const startTimer = () => {
+    realTime.value.startTime = Date.now()
     timer.value = setInterval(() => {
       elapsedTime.value++;
     }, 1000);
@@ -134,6 +139,7 @@ export const useMemoryGameStore = defineStore('memory', () => {
   };
 
   const endGame = async() => {
+    realTime.value.endTime = Date.now()
     stopTimer();
     gameFinished.value = true;
 
@@ -145,7 +151,7 @@ export const useMemoryGameStore = defineStore('memory', () => {
               winner_user_id: authStore.user.id,
               status: 'E',
               total_turns_winner: turnsTaken.value,
-              total_time: elapsedTime.value
+              total_time: realTime.value.endTime - realTime.value.startTime
           });
         }
           game.value = response.data.data;
