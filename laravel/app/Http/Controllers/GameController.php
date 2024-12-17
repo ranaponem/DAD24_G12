@@ -127,11 +127,12 @@ class GameController extends Controller
     }
 
     // Order by either number of turns or time taken (score)
+    $isOrderedByScore = false;
     if ($request->has('score_type')){
       if($request->query('score_type') === 'time')
-        $query->orderBy('total_time', 'asc');
+        $query->orderBy('total_time', 'asc')->orderBy('total_turns_winner', 'asc');
       else if($request->query('score_type') === 'turns')
-        $query->orderBy('total_turns_winner', 'asc');
+        $query->orderBy('total_turns_winner', 'asc')->orderBy('total_time', 'asc');
     }
 
     // Filter by type, defaults to singleplayer
@@ -162,7 +163,7 @@ class GameController extends Controller
       else
         return response()->json(['message' => 'Invalid \'date_end\' date format: must be DD-mm-YYYY'], 402);
     }
-    // Ordering by most recent
-    $query->orderBy('ended_at', 'desc');
+    // Ordering by most recent or by oldest if score ordering was parsed
+    $query->orderBy('ended_at', $isOrderedByScore ? 'asc' : 'desc');
   }
 }

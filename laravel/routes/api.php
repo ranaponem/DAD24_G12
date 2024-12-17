@@ -40,12 +40,12 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/users', [UserController::class, 'index'])
         ->can('viewAny', User::class);
 
+    # Special Get (balance only)
+    Route::get('/users/mybalance', [UserController::class, 'showMyBalance']);
+
     # Get
     Route::get('/users/{user}', [UserController::class, 'show'])
         ->can('view', 'user');
-
-    # Special Get (balance only)
-    Route::get('/users/mybalance', [UserController::class, 'showMyBalance']);
 
     # Update my user 
     Route::put('/users/me', [UserController::class, 'update']);
@@ -57,7 +57,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::delete('/users/me', [UserController::class, 'destroy'])
         ->can('delete', User::class);
 
-    
+
     # Get My
     Route::get('/games/my', [GameController::class, 'showMy']);
 
@@ -101,7 +101,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Delete user
     Route::delete('/users/{user}', [AdminController::class, 'destroy'])
         ->can('admin-destroy', 'user');
-    
+
 });
 
 # Get All

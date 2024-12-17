@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 const authStore = useAuthStore()
 
-const email = ref('a1@mail.pt')
+const email = ref('p2@mail.pt')
 const password = ref('123')
 const responseData = ref('')
 
@@ -60,17 +60,8 @@ const submit = async () => {
                     Forgot Password?
                     </a>
                     </div> -->
-                    <button @click.prevent="submit" type="submit"
-                        class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">Login</button>
-
-                    <div v-if="responseData" class="space-y-2 mt-8">
-                        <label for="response" class="block text-sm font-medium text-gray-700">
-                            Response
-                        </label>
-                        <textarea :value="responseData" id="response" rows="3"
-                            class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            readonly></textarea>
-                    </div>
+                <button @click.prevent="submit" type="submit"
+                    class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">Login</button>
             </form>
             <!--<p class="mt-4 text-sm text-center text-gray-600">
                 Don't have an account? 
