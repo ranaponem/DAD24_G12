@@ -36,8 +36,12 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/auth/refreshtoken', [AuthController::class,'refreshtoken']);
     Route::get('/users/me', [UserController::class, 'showMe']);
 
-    # Get All
+    # Get All Players
     Route::get('/users', [UserController::class, 'index'])
+        ->can('viewAny', User::class);
+
+    # Get All
+    Route::get('/admins', [UserController::class, 'indexAdmins'])
         ->can('viewAny', User::class);
 
     # Get

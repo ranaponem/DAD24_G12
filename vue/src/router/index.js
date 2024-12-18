@@ -3,6 +3,7 @@ import HistoryComponent from '@/components/HistoryComponent.vue'
 import ScoreboardComponent from '@/components/ScoreboardComponent.vue'
 import TransactionsComponent from '@/components/TransactionsComponent.vue'
 import StatisticsComponent from '@/components/StatisticsComponent.vue'
+import AdministrationComponent from '@/components/AdministrationComponent.vue'
 
 import LaravelTester from '@/components/LaravelTester.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
@@ -56,6 +57,11 @@ const router = createRouter({
                         path: '/statistics',
                         name: 'statistics',
                         component: StatisticsComponent
+                },
+                {
+                        path: '/administration',
+                        name: 'administration',
+                        component: AdministrationComponent
                 }
 
         ]

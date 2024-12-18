@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
-    private const PHOTO_PATH = 'public/photos/'; 
+    private const PHOTO_PATH = 'public/photos/';
 
     public function showMe(Request $request) {
         return new UserResource($request->user());
@@ -19,6 +19,10 @@ class UserController extends Controller
 
     public function index() {
         return UserResource::collection(User::where('type', 'P')->paginate(20));
+    }
+
+    public function indexAdmins() {
+        return UserResource::collection(User::where('type', 'A')->paginate(20));
     }
 
     public function show(User $user) {
@@ -48,7 +52,7 @@ class UserController extends Controller
 
         return new UserResource($user);
     }
-    
+
     public function destroy(User $user) {
         if($user->photo_filename && Storage::fileExists(UserController::PHOTO_PATH . $user->photo_filename)) {
             Storage::delete(UserController::PHOTO_PATH . $user->photo_filename);

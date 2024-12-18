@@ -26,6 +26,10 @@ const goToTransactions = () => {
 const goToStatistics = () => {
         router.push('/statistics');
 };
+
+const goToAdministration = () => {
+        router.push('/administration');
+};
 </script>
 
 <template>
@@ -60,6 +64,9 @@ const goToStatistics = () => {
                                 </button>
                                 <button v-if="isAdmin" @click="goToStatistics" class="w-full px-4 py-2 mt-6 text-white bg-secondary-light hover:bg-secondary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                                         Statistics
+                                </button>
+                                <button v-if="isAdmin" @click="goToAdministration" class="w-full px-4 py-2 mt-6 text-white bg-secondary-light hover:bg-secondary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                        Administration
                                 </button>
                         </div>
                 </div>
