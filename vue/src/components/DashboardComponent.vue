@@ -18,11 +18,7 @@ const goToScoreboard = () => {
 </script>
 
 <template>
-        <div class="flex flex-col min-h-screen">
-                <!-- Logo -->
-                <div class="flex w-full justify-start px-4 mt-4">
-                        <img src="/estg_h-01.png" alt="ESTG Logo" class="w-40 h-auto object-contain" />
-                </div>
+    <div class="flex flex-col min-h-screen">
 
                 <!-- Main content -->
                 <div class="flex flex-col items-center justify-center flex-grow">
