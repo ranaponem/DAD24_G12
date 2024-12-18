@@ -1,7 +1,7 @@
 <script setup>
 import { useErrorStore } from '@/stores/error';
 import { useProfileStore } from '@/stores/profile';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import FormsInput from '../ui/forms/FormsInput.vue';
 
 const storeError = useErrorStore()
@@ -11,15 +11,16 @@ const props = defineProps({
     inUpdateMode: { type: Boolean, required: true }
 })
 
-const password = ref({})
+const password = ref({
+    old_password: null,
+    password: null,
+    password_confirmation: null
+})
 
 const resetPassword = () => {
-    password.value = {
-        old_password: '',
-        password: '',
-        password_confirmation: ''
-    }
-    storeError.resetMessages()
+    password.value.old_password = ''
+    password.value.password = ''
+    password.value.password_confirmation = ''
 }
 
 const updatePassword = async () => {
@@ -28,10 +29,9 @@ const updatePassword = async () => {
         resetPassword()
 }
 
-onMounted(() => {
-    resetPassword()
-})
+const isEmpty = (field) => password.value[field] && password.value[field].length > 0 ? 0 : 1
 </script>
+
 
 <template>
     <div v-show="inUpdateMode"
@@ -43,12 +43,15 @@ onMounted(() => {
         <div class="border-2 border-gray-900 dark:border-gray-100" />
         <form class="items-center flex flex-col">
             <div class="flex flex-col items-center space-y-3 py-6 px-32 w-full">
-                <FormsInput v-model="password.old_password" label="Current password" placeholder="password"
-                    inputType="password" :errorMessage="storeError.fieldMessage('old_password')" />
-                <FormsInput v-model="password.password" label="New password" placeholder="password" inputType="password"
-                    :errorMessage="storeError.fieldMessage('password')" />
-                <FormsInput v-model="password.password_confirmation" label="Confirm password" placeholder="password"
-                    inputType="password" :errorMessage="storeError.fieldMessage('password_confirmation')" />
+                <FormsInput v-model="password.old_password" input-type="password"
+                            :error-message="storeError.fieldMessage('old_password')"
+                            label="Current Password:" :as-errors="isEmpty('old_password')" />
+                <FormsInput v-model="password.password" input-type="password"
+                            :error-message="storeError.fieldMessage('password')"
+                            label="New Password:" :as-errors="isEmpty('password')" />
+                <FormsInput v-model="password.password_confirmation" input-type="password"
+                            :error-message="storeError.fieldMessage('password_confirmation')"
+                            label="Confirm new Password:" :as-errors="isEmpty('password_confirmation')" />
             </div>
             <div v-show="inUpdateMode" class="flex flex-row w-3/5 h-fit justify-between pb-5">
                 <button @click.prevent="resetPassword"

@@ -1,7 +1,9 @@
 <script setup>
 import Toaster from './components/ui/toast/Toaster.vue'
 import ProfileMini from './components/profile/ProfileMini.vue'
+import { useAuthStore } from './stores/auth';
 
+const storeAuth = useAuthStore()
 </script>
 
 <template>

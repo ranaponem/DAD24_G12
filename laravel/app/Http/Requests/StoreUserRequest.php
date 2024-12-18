@@ -25,9 +25,9 @@ class StoreUserRequest extends FormRequest
     {
         return [
             "name"=> "required|string|min:3|max:255",
-            "email"=> ["required", "email", "min:3","max:255",Rule::unique('users', 'email')->ignore(auth()->user()->id)],
-            "nickname"=> ["required","string","min:4","max:20",Rule::unique('users', 'nickname')->ignore(auth()->user()->id)], 
-            "password"=> ["required","string", Password::min(8)->letters()->numbers(), "confirmed"],
+            "email"=> ["required", "email", "min:3","max:255",Rule::unique('users', 'email')],
+            "nickname"=> ["required","string","min:4","max:20",Rule::unique('users', 'nickname')], 
+            "password"=> ["required","string", Password::min(3)->letters()->numbers(), "confirmed"],
             "photo_image"=> "sometimes|image|mimes:jpeg,jpg,png|max:4096",
         ];
     }

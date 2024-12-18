@@ -1,9 +1,9 @@
 import DashboardComponent from '@/components/DashboardComponent.vue'
 import LoginPage from '@/components/LoginPage.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
-import WebSocketTester from '@/components/WebSocketTester.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import RegisterPage from '@/components/RegisterPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,13 +19,9 @@ const router = createRouter({
       component: LoginPage
     },
     {
-      path: '/navbar',
-      children: [
-        {
-          path: 'websocket',
-          component: WebSocketTester
-        }
-      ]
+      path: '/register',
+      name: 'register',
+      component: RegisterPage
     },
     {
       path: '/profile',
@@ -34,17 +30,17 @@ const router = createRouter({
     }
   ]
 })
-router.beforeEach(async(to, from, next) => {
-        const storeAuth = useAuthStore()
-        const anonymous = ['home', 'login', 'scoreboard']
+router.beforeEach(async (to, from, next) => {
+  const storeAuth = useAuthStore()
+  const anonymous = ['home', 'login', 'scoreboard', 'register']
 
-        if(anonymous.includes(to.name) || storeAuth.user)
-        next()
+  if (anonymous.includes(to.name) || storeAuth.user)
+    next()
 
-        else{
-                if(confirm('You must be logged in to access this page!')){
-                        next({name : 'login'})
-                }
-        }
-}) 
+  else {
+    if (confirm('You must be logged in to access this page!')) {
+      next({ name: 'login' })
+    }
+  }
+})
 export default router

@@ -2,16 +2,17 @@ import { ref, computed, inject } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 import { useErrorStore } from '@/stores/error'
-
 import avatarNoneAssetURL from '@/assets/avatar-none.png'
+import { useToast } from '@/components/ui/toast'
 
 export const useAuthStore = defineStore('auth', () => {
-  const socket = inject('socket') 
-  
+  const socket = inject('socket')
+
   const storeError = useErrorStore()
 
   const user = ref(null)
   const token = ref('')
+  const rememberMe = ref(false)
 
   const userName = computed(() => {
     return user.value ? user.value.name : ''
@@ -106,13 +107,58 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const deleteAccount = async (credentials) => {
+  const registerAccount = async (user) => {
+    storeError.resetMessages()
     try {
-        await axios.delete('users/me', { password: credentials })
-        clearUser()
-        return true
+      const formData = new FormData()
+
+      //add image if any to user
+      if (user.image)
+        formData.append('photo_image', user.image)
+      
+      formData.append('name', user.name)
+      formData.append('email', user.email)
+      formData.append('nickname', user.nickname)
+      formData.append('password', user.password)
+      formData.append('password_confirmation', user.password_confirm)
+      
+      await axios.post('users', formData, {
+        headers: {"Content-Type": "multipart/form-data"}
+      })
+      await login({
+        email: user.email,
+        password: user.password
+      })
+      return true
     } catch (e) {
-        return e
+      storeError.setErrorMessages(
+        e.response.data.message,
+        e.response.data.errors,
+        e.response.status,
+        'Authentication Error!'
+      )
+      return false
+    }
+  }
+
+  const deleteAccount = async (credentials) => {
+    const { toast } = useToast()
+    try {
+      await axios.delete('users/me', { data: credentials })
+      toast({
+        title: 'Account deletion',
+        description: 'Account deleted successfully.',
+        variant: 'success'
+      })
+      clearUser()
+      return true
+    } catch (e) {
+      toast({
+        title: 'Account deletion Error',
+        description: e.response.data.errors['password'][0],
+        variant: 'destructive'
+      })
+      return false
     }
   }
 
@@ -162,6 +208,7 @@ export const useAuthStore = defineStore('auth', () => {
     userBalance,
     login,
     logout,
+    registerAccount,
     deleteAccount
   }
 })

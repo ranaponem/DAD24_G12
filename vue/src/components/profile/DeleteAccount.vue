@@ -1,25 +1,29 @@
 <script setup>
-import { useProfileStore } from '@/stores/profile';
-import { useErrorStore } from '@/stores/error';
 import { onMounted, ref } from 'vue';
 import FormsInput from '../ui/forms/FormsInput.vue';
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
-const storeError = useErrorStore()
-const storeProfile = useProfileStore()
+const storeAuth = useAuthStore()
+const router = useRouter()
 
 const deleteModalStatus = ref(0)
-const pws = ref("")
+const psw = ref("")
 
 const resetModal = () => {
     deleteModalStatus.value = 0
-    pws.value = ""
+    psw.value = ""
 }
 const modalAppear = () => deleteModalStatus.value = 1
-const modalRequirePassword = () => {
+const modalRequirePassword = async () => {
     deleteModalStatus.value++
     if(deleteModalStatus.value > 2) {
-        storeProfile.deleteAccount(...pws.value)
+        const result = await storeAuth.deleteAccount({
+            password: psw.value
+        })
         resetModal()
+        if (result)
+            router.push({ name: 'home'})
     }
 }
 
@@ -53,7 +57,7 @@ onMounted(() => {
                 </div>
                 <div v-show="deleteModalStatus == 2" class="flex flex-col w-3/4 h-fit pb-10 items-center">
                     <span>Current Password</span>
-                    <FormsInput v-model="pws" />
+                    <FormsInput v-model="psw" id="password" input-type="password" />
                 </div>
                 <div class="flex justify-between w-full h-fit px-2">
                     <button @click.prevent="resetModal"
