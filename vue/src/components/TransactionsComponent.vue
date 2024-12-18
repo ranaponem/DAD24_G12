@@ -15,7 +15,7 @@ const isAdmin = authStore.userType === 'A';
 const fetchTransactions = async () => {
         try {
                 if (isAdmin) {
-                        await transactionsStore.getAllTransactions(pageNum.value, userNickname.value, transactionType.value);
+                        await transactionsStore.getTransactions(pageNum.value, userNickname.value, transactionType.value);
                 } else {
                         await transactionsStore.getMyTransactions(pageNum.value, transactionType.value);
                 }

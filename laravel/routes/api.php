@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\BoardController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\MultiplayerGamePlayedController;
 use App\Http\Controllers\TransactionController;
 use App\Models\User;
@@ -46,7 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Special Get (balance only)
     Route::get('/users/mybalance', [UserController::class, 'showMyBalance']);
 
-    # Update complete 
+    # Update complete
     Route::put('/users/{user}', [UserController::class, 'update'])
         ->can('update', 'user');
 
@@ -55,7 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
         ->can('delete', 'user');
 
 
-    
+
     # Get My
     Route::get('/games/my', [GameController::class, 'showMy']);
 
@@ -87,6 +88,19 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Create transaction
     Route::post('/transactions', [TransactionController::class, 'store'])
         ->can('create', Transaction::class);
+
+    # Get All
+    Route::get('/statistics/profit', [StatisticsController::class, 'totalProfit'])
+        ->can('isAdmin');
+
+    Route::get('/statistics/detailed-profit', [StatisticsController::class, 'detailedProfit'])
+        ->can('isAdmin');
+
+    Route::get('/statistics/total-users', [StatisticsController::class, 'totalUsers'])
+        ->can('isAdmin');
+
+    Route::get('/statistics/total-games', [StatisticsController::class, 'totalGames'])
+        ->can('isAdmin');
 });
 
 # Get All

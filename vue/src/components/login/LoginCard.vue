@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button'
 
 const authStore = useAuthStore()
 
-const email = ref('p2@mail.pt')
+const email = ref('a2@mail.pt')
 const password = ref('123')
 const responseData = ref('')
 

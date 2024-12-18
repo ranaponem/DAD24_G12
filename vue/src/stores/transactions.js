@@ -33,7 +33,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                 }
         };
 
-        const getAllTransactions = async (pageNum, userNickname, transactionType) => {
+        const getTransactions = async (pageNum, userNickname, transactionType) => {
                 let params = new URLSearchParams(); 
                 params.append('page', pageNum); 
                 if(userNickname != ''){
@@ -58,5 +58,7 @@ export const useTransactionsStore = defineStore('transactions', () => {
                         return [];
                 }
         };
-        return { transactions , meta, getMyTransactions, getAllTransactions};
+
+
+        return { transactions , meta, getMyTransactions, getTransactions};
 })

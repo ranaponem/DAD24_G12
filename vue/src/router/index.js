@@ -2,6 +2,8 @@ import DashboardComponent from '@/components/DashboardComponent.vue'
 import HistoryComponent from '@/components/HistoryComponent.vue'
 import ScoreboardComponent from '@/components/ScoreboardComponent.vue'
 import TransactionsComponent from '@/components/TransactionsComponent.vue'
+import StatisticsComponent from '@/components/StatisticsComponent.vue'
+
 import LaravelTester from '@/components/LaravelTester.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
@@ -49,6 +51,11 @@ const router = createRouter({
                         path: '/transactions',
                         name: 'transactions',
                         component: TransactionsComponent
+                },
+                {
+                        path: '/statistics',
+                        name: 'statistics',
+                        component: StatisticsComponent
                 }
 
         ]
