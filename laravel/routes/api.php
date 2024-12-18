@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/users/{user}', [UserController::class, 'show'])
         ->can('view', 'user');
 
-    # Update my user
+    # Update my user 
     Route::put('/users/me', [UserController::class, 'update']);
 
     # Update my password

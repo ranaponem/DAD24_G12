@@ -41,6 +41,23 @@ export const useAuthStore = defineStore('auth', () => {
     return avatarNoneAssetURL
   })
 
+  const userBalance = async () => {
+    try{
+      const responseCoins = await axios.get('users/mybalance')
+      const balance = ref(responseCoins.data.brain_coins_balance)
+      return balance.value
+    }
+    catch(e){
+      storeError.setErrorMessages(
+        e.response.data.message,
+        e.response.data.errors,
+        e.response.status,
+        'Balance Error!'
+      )
+      return false
+    }
+  }
+
   // This function is "private" - not exported by the store
   const clearUser = () => {
     resetIntervalToRefreshToken()
@@ -58,7 +75,6 @@ export const useAuthStore = defineStore('auth', () => {
       axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
       const responseUser = await axios.get('users/me')
       user.value = responseUser.data.data
-      socket.emit('login', user.value)
       repeatRefreshToken()
       return user.value
     } catch (e) {
@@ -189,6 +205,7 @@ export const useAuthStore = defineStore('auth', () => {
     userEmail,
     userType,
     userPhotoUrl,
+    userBalance,
     login,
     logout,
     registerAccount,

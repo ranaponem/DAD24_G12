@@ -1,7 +1,6 @@
 import DashboardComponent from '@/components/DashboardComponent.vue'
 import LoginPage from '@/components/LoginPage.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
-import CoinsPage from '@/components/coins/CoinsPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import RegisterPage from '@/components/RegisterPage.vue'
@@ -25,33 +24,23 @@ const router = createRouter({
       component: RegisterPage
     },
     {
-      path: '/navbar',
-      children: [
-
-      ]
-    },
-    {
       path: '/profile',
       name: 'profile',
       component: ProfilePage
-    },
-    {
-      path: '/coins',
-      name: 'coins',
-      component: CoinsPage
     }
   ]
 })
-
-router.beforeEach(async(to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const storeAuth = useAuthStore()
-  const anonymous = ['home', 'login', 'register']
+  const anonymous = ['home', 'login', 'scoreboard', 'register']
 
-  if(anonymous.includes(to.name) || storeAuth.user)
+  if (anonymous.includes(to.name) || storeAuth.user)
     next()
 
-  else
-    next({name : 'login'})
-}) 
-
+  else {
+    if (confirm('You must be logged in to access this page!')) {
+      next({ name: 'login' })
+    }
+  }
+})
 export default router
