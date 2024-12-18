@@ -11,13 +11,27 @@ export const useProfileStore = defineStore('user', () => {
     const storeError = useErrorStore()
     const storeAuth = useAuthStore()
 
-    const user = storeAuth.user
-    const temp = ref({})
+    const user = ref(storeAuth.user)
 
-    const updateProfile = async (newProfile) => {
+    const updateProfile = async (userPayload) => {
+        storeError.resetMessages()
         try {
-            const responseProfile = await axios.put('users/me', newProfile)
-            user.value = responseProfile.data.data
+            const formData = new FormData()
+
+            //add image if any to user
+            if (userPayload.image)
+                formData.append('photo_image', userPayload.image)
+            
+            formData.append('_method', 'put')
+            formData.append('name', userPayload.name)
+            formData.append('email', userPayload.email)
+            formData.append('nickname', userPayload.nickname)
+
+            const responseProfile = await axios.post('users/me', formData, {
+                headers: {"Content-Type": "multipart/form-data"},
+                withCredentials: true
+            })
+            storeAuth.user.value = responseProfile.data.data
             toast({
                 title: 'Profile update',
                 description: 'Profile has been updated successfully.',
@@ -36,6 +50,7 @@ export const useProfileStore = defineStore('user', () => {
     }
 
     const updatePassword = async (newPassword) => {
+        storeError.resetMessages()
         try {
             await axios.put('users/updatepassword', newPassword)
             toast({
@@ -55,34 +70,9 @@ export const useProfileStore = defineStore('user', () => {
         }
     }
 
-    const deleteAccount = async (credentials) => {
-        const result = await storeAuth.deleteAccount(credentials)
-        if (result == true) {
-            toast({
-                title: 'Account deletion',
-                description: 'Account was successfully deleted.',
-                variant: 'information'
-            })
-            return true
-        }
-          storeError.setErrorMessages(
-            result.response.data.message,
-            result.response.data.errors,
-            result.response.status,
-            'DEBUG'
-          )
-        /*toast({
-            title: 'Account deletion Error!',
-            description: 'The password provided is invalid',
-            variant: 'destructive'
-        })*/
-        return false
-    }
 
     return {
         updateProfile,
-        updatePassword,
-        deleteAccount,
-        temp
+        updatePassword
     }
 })

@@ -1,10 +1,10 @@
 import DashboardComponent from '@/components/DashboardComponent.vue'
 import LoginPage from '@/components/LoginPage.vue'
 import ProfilePage from '@/components/profile/ProfilePage.vue'
-import WebSocketTester from '@/components/WebSocketTester.vue'
 import CoinsPage from '@/components/coins/CoinsPage.vue'
 import { createRouter, createWebHistory } from 'vue-router'
-import {useAuthStore} from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
+import RegisterPage from '@/components/RegisterPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,12 +20,14 @@ const router = createRouter({
       component: LoginPage
     },
     {
+      path: '/register',
+      name: 'register',
+      component: RegisterPage
+    },
+    {
       path: '/navbar',
       children: [
-        {
-          path: 'websocket',
-          component: WebSocketTester
-        }
+
       ]
     },
     {
@@ -43,7 +45,7 @@ const router = createRouter({
 
 router.beforeEach(async(to, from, next) => {
   const storeAuth = useAuthStore()
-  const anonymous = ['home', 'login']
+  const anonymous = ['home', 'login', 'register']
 
   if(anonymous.includes(to.name) || storeAuth.user)
     next()

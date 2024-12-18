@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
-    private const PHOTO_PATH = 'public/photos/';
+    private const PHOTO_PATH = 'photos/';
 
     public function showMe(Request $request) {
         return new UserResource($request->user());
@@ -46,8 +46,8 @@ class UserController extends Controller
             $user->brain_coins_balance = 0;
             $user->save();
 
-            if($request->hasFile('photo')) {
-                $path = $request->photo_image->store(UserController::PHOTO_PATH);
+            if($request->hasFile('photo_image')) {
+                $path = $request->photo_image->store(UserController::PHOTO_PATH, 'public');
                 $user->photo_filename = basename($path);
                 $user->save();
             }
@@ -78,11 +78,11 @@ class UserController extends Controller
         $user->fill($request->validated());
         $user->save();
 
-        if($request->hasFile('photo')) {
-            if($user->photo_filename && Storage::fileExists(UserController::PHOTO_PATH . $user->photo_filename)) {
-                Storage::delete(UserController::PHOTO_PATH . $user->photo_filename);
+        if($request->hasFile('photo_image')) {
+            if($user->photo_filename && Storage::disk('public')->fileExists(UserController::PHOTO_PATH . $user->photo_filename)) {
+                Storage::disk('public')->delete(UserController::PHOTO_PATH . $user->photo_filename);
             }
-            $path = $request->photo_image->store(UserController::PHOTO_PATH);
+            $path = $request->photo_image->store(UserController::PHOTO_PATH, 'public');
             $user->photo_filename = basename($path);
             $user->save();
         }
@@ -95,7 +95,7 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), [
             'old_password' => ['required','string','current_password'],
-            "password"=> ["required","string", Password::min(8)->letters()->numbers(), "confirmed"],
+            "password"=> ["required","string", Password::min(3)->letters()->numbers(), "confirmed"],
         ]);
 
         if ($validator->fails()) {

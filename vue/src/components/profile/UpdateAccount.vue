@@ -4,6 +4,7 @@ import { useErrorStore } from '@/stores/error';
 import { useProfileStore } from '@/stores/profile';
 import { onMounted, ref } from 'vue';
 import FormsInput from "../ui/forms/FormsInput.vue";
+import FormsImage from '../ui/forms/FormsImage.vue';
 
 const storeAuth = useAuthStore()
 const storeError = useErrorStore()
@@ -19,15 +20,19 @@ const changeMode = () => {
     emit('changeMode')
 }
 
-const user = ref({})
+const user = ref({
+    name: storeAuth.user.name,
+    email: storeAuth.user.email,
+    nickname: storeAuth.user.nickname,
+    image: null
+})
 
 const resetUser = () => {
     emit('changeMode')
-    user.value = {
-        name: storeAuth.user.name,
-        email: storeAuth.user.email,
-        nickname: storeAuth.user.nickname
-    }
+    user.value.name = storeAuth.user.name
+    user.value.email = storeAuth.user.email
+    user.value.nickname = storeAuth.user.nickname
+    user.value.image = null
     storeError.resetMessages()
 }
 
@@ -39,10 +44,13 @@ const updateProfile = async () => {
     }
 }
 
+const imageUpload = (file) => user.value.image = file
+
+const isEmptyError = (field) => user.value[field] && user.value[field].length > 0 ? 0 : 1
+
 onMounted(() => {
     resetUser()
 })
-
 </script>
 
 <template>
@@ -53,19 +61,19 @@ onMounted(() => {
         </div>
         <div class="border-2 border-gray-900 dark:border-gray-100" />
         <form class="items-center flex flex-col">
-            <div class="flex lg:flex-row flex-col-reverse content-center justify-between px-10">
-                <div class="w-full flex flex-col justify-center content-center py-6 px-10 space-y-3">
-                    <FormsInput v-model="user.name" label="Name" :errorMessage="storeError.fieldMessage('name')"
-                        :readonly="!inUpdateMode" />
-                    <FormsInput v-model="user.email" label="Email" placeholder="example@mail.com"
-                        :errorMessage="storeError.fieldMessage('email')" :readonly="!inUpdateMode" />
+            <div class="flex lg:flex-row flex-col-reverse w-full content-center justify-center items-center px-10">
+                <div class="w-full flex flex-col justify-center content-center py-5 px-10 space-y-4">
+                    <FormsInput v-model="user.name" label="Name" 
+                        :errorMessage="storeError.fieldMessage('name')" :readonly="!inUpdateMode" :as-errors="isEmptyError('name')"/>
+                    <FormsInput v-model="user.email" label="Email" placeholder="example@mail.com" input-type="email"
+                        :errorMessage="storeError.fieldMessage('email')" :readonly="!inUpdateMode" :as-errors="isEmptyError('email')"/>
                     <FormsInput v-model="user.nickname" label="Nickname"
-                        :errorMessage="storeError.fieldMessage('nickname')" :readonly="!inUpdateMode" />
+                        :errorMessage="storeError.fieldMessage('nickname')" :readonly="!inUpdateMode" :as-errors="isEmptyError('nickname')"/>
                 </div>
                 <div class="border-gray-900 dark:border-gray-100" />
-                <div class="p-6 flex items-center justify-end mb-6 h-full w-1/2">
-                    <img :src="storeAuth.userPhotoUrl" alt="Profile Picture"
-                        class="w-full h-fit rounded-full object-cover border-8 border-double border-secondary-dark">
+                <div class="flex p-3 items-center justify-center h-full w-1/2">
+                    <FormsImage @image-upload="imageUpload" :label="inUpdateMode ? 'Upload a new photo or avatar!' : ''" :placeholder="storeAuth.userPhotoUrl"
+                        :error-message="storeError.fieldMessage('photo_image')" :readonly="!inUpdateMode" />
                 </div>
             </div>
             <button v-show="!inUpdateMode" @click.prevent="changeMode"
