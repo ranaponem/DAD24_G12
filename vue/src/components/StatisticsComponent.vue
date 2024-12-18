@@ -14,8 +14,6 @@ const statisticsStore = useStatisticsStore();
 const chartData = ref({
         labels: [],
         datasets: [{
-                label: 'Profit (€)',
-                backgroundColor: 'rgba(0,255, 0, 1)', 
                 borderWidth: 1,
                 data: [],
                 segment: {
@@ -73,8 +71,6 @@ const updateGraph = async () => {
                 chartData.value = {
                         labels: labels,
                         datasets: [{
-                                label: 'Profit (€)',
-                                backgroundColor: 'rgba(0,170, 0, 1)', 
                                 borderWidth: 1,
                                 data: values,
                                 segment: {
@@ -238,18 +234,13 @@ const handleGamesTimePeriodChange = () => {
                         <!-- Chart Section (take remaining space) -->
                         <div class="flex-grow w-full">
                                 <div v-if="chartData.labels.length === 0 || totalProfit === 0">
-                                        <p class="text-center text-xl font-semibold text-gray-500">No moneys were made</p>
+                                        <p class="text-center text-xl font-semibold text-gray-500">No money was grabbed</p>
                                 </div>
                                 <div v-else>
                                         <Line :data="chartData" :options="{
                                                 responsive: true,
                                                 plugins: {
-                                                        legend: { display: true },
-                                                        title: { 
-                                                                display: true, 
-                                                                text: 'Profit Overview',
-                                                                font: { size: 20 }
-                                                        }
+                                                        legend:{display:false},
                                                 },
                                                 scales: {
                                                         y: { min: 0 }
@@ -289,11 +280,11 @@ const handleGamesTimePeriodChange = () => {
                                 <!-- Top 5 Losers Chart inside Total Users Card -->
                                 <div class="flex flex-col items-center w-full mt-6">
                                         <!-- Title centered above the chart -->
-                                        <h2 class="text-2xl font-bold mb-4 text-blue-600 text-center">Top 5 Losers</h2>
+                                        <h2 class="text-2xl font-bold mb-4 text-blue-600 text-center">Top 5 Supporters</h2>
 
                                         <!-- Bar Chart (Centered) -->
                                         <div v-if="!topUsersData.datasets[0].data[0]">
-                                                <p class="text-center text-xl font-semibold text-gray-500">No losers to show</p>
+                                                <p class="text-center text-xl font-semibold text-gray-500">No supporters to show</p>
                                         </div>
                                         <div v-else class="flex justify-center items-center h-80 w-full">
                                                 <Bar 
@@ -309,7 +300,7 @@ const handleGamesTimePeriodChange = () => {
                                                                                 label: function(context) {
                                                                                         const userIndex = context.dataIndex;
                                                                                         const fullName = topUsersData.labels[userIndex]; // Use the name from the data
-                                                                                        return `${fullName}: €${context.raw}`;  // Full name with amount spent
+                                                                                        return `${fullName}: ${context.raw}€`;  // Full name with amount spent
                                                                                 }
                                                                         }
                                                                 }
@@ -319,7 +310,7 @@ const handleGamesTimePeriodChange = () => {
                                                                         beginAtZero: true,
                                                                         ticks: {
                                                                                 callback: function(value) {
-                                                                                        return `€${value}`; // Add € sign to X-axis labels
+                                                                                        return `${value}€`; // Add € sign to X-axis labels
                                                                                 }
                                                                         }
                                                                 },
