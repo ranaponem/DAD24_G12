@@ -24,6 +24,7 @@ class TransactionTypeRequest extends FormRequest
         $rules = [
             'type' => 'string|min:1|max:1|in:P,B,I',
             'page'=> 'numeric|min:1',
+            'nickname' => 'string|min:1'
         ];
 
         if ($this->has('type')) {
@@ -38,6 +39,7 @@ class TransactionTypeRequest extends FormRequest
                 default => null,
             };
         }
+
 
         return $rules;
     }

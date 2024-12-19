@@ -1,7 +1,11 @@
 <script setup>
 import {useRouter} from 'vue-router';
+import { useAuthStore } from "@/stores/auth";
 
+const authStore = useAuthStore();
 const router = useRouter();
+
+const isAdmin = authStore.userType === 'A';
 
 const goToHistory = () => {
         router.push('/history');
@@ -15,6 +19,17 @@ const goToScoreboard = () => {
         router.push('/scoreboard');
 };
 
+const goToTransactions = () => {
+        router.push('/transactions');
+};
+
+const goToStatistics = () => {
+        router.push('/statistics');
+};
+
+const goToAdministration = () => {
+        router.push('/administration');
+};
 </script>
 
 <template>
@@ -33,16 +48,25 @@ const goToScoreboard = () => {
                         <!-- Buttons -->
                         <div class="flex space-x-4">
                                 <!-- Left Button -->
-                                <button @click="goToHistory" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                <button @click="goToHistory" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                                         History
                                 </button>
                                 <!-- Center Button -->
-                                <button @click="goToSelectGameMode" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                <button @click="goToSelectGameMode" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                                         Select Game Mode
                                 </button>
                                 <!-- Right Button -->
-                                <button @click="goToScoreboard" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                <button @click="goToScoreboard" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                                         Scoreboard
+                                </button>
+                                <button @click="goToTransactions" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                        Transactions
+                                </button>
+                                <button v-if="isAdmin" @click="goToStatistics" class="w-full px-4 py-2 mt-6 text-white bg-secondary-light hover:bg-secondary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                        Statistics
+                                </button>
+                                <button v-if="isAdmin" @click="goToAdministration" class="w-full px-4 py-2 mt-6 text-white bg-secondary-light hover:bg-secondary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                        Administration
                                 </button>
                         </div>
                 </div>

@@ -33,5 +33,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin-destroy', function (User $user, User $otherUser) {
             return $user->type == User::TYPE_ADMIN && $user->id != $otherUser->id;
         });
+        Gate::define('isAdmin', function(User $user){
+            return $user->type == User::TYPE_ADMIN;
+        });
     }
 }
