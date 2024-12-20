@@ -21,9 +21,12 @@ class UpdateGameRequest extends FormRequest
      */
     public function rules(): array
     {
+
       return [
-        "status" => "string|in:PL,E,I",
-        "total_time" => "nullable|numeric|min:0"
-      ];
+        "status" => "required|string|in:PL,E,I",
+        "total_time" => "required_if:status,E|decimal:2,16|min:0",
+        "total_turns_winner" => "required_if:status,E|numeric|min:1",
+        "winner_user_id" => "nullable|numeric|exists:users,id",
+        ];
     }
 }
