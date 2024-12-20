@@ -168,5 +168,7 @@ class GameController extends Controller
             else
             return response()->json(['message' => 'Invalid \'date_end\' date format: must be DD-mm-YYYY'], 402);
         }
+        // Ordering by most recent or by oldest if score ordering was parsed
+        $query->orderBy('ended_at', $isOrderedByScore ? 'asc' : 'desc');
     }
 }
