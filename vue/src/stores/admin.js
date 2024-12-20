@@ -14,7 +14,6 @@ export const useAdminStore = defineStore('admin', () => {
                 try {
                         const formData = new FormData()
 
-                        //add image if any to admin
                         if (admin.image)
                         formData.append('photo_image', admin.image)
 

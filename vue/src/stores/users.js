@@ -69,5 +69,21 @@ export const useUsersStore = defineStore('users', () => {
                 }
         }
 
-        return { allPlayers, getPlayers, getAdmins, changeUserBlockedState};
+        const deleteUser = async (id) => {
+
+                try {
+                        const responseUsers = await axios.delete('users/' + id);
+                        return responseUsers;
+                } catch (e) {
+                        storeError.setErrorMessages(
+                                e.response.data.message,
+                                e.response.data.errors,
+                                e.response.status,
+                                'Error fetching User State'
+                        );
+                        return [];
+                }
+        }
+
+        return { allPlayers, getPlayers, getAdmins, changeUserBlockedState, deleteUser};
 })

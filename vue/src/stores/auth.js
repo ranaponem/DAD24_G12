@@ -58,7 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
                 }
         }
 
-        // This function is "private" - not exported by the store
+        
         const clearUser = () => {
                 resetIntervalToRefreshToken()
                 if (user.value)
@@ -112,7 +112,6 @@ export const useAuthStore = defineStore('auth', () => {
                 try {
                         const formData = new FormData()
 
-                        //add image if any to user
                         if (user.image)
                         formData.append('photo_image', user.image)
 

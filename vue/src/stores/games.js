@@ -12,13 +12,13 @@ export const useGamesStore = defineStore('games', () => {
         const meta = ref({})
 
         const getHistory = async (pageNum, board) => {
-                let params = new URLSearchParams(); // Declare params outside of the block
+                let params = new URLSearchParams(); 
 
                 if (board === "ALL") {
-                        params.append('page', pageNum); // Add only the page parameter
+                        params.append('page', pageNum); 
                 } else {
                         params.append('page', pageNum);
-                        params.append('board', board); // Add both page and board parameters
+                        params.append('board', board); 
                 }
 
                 try {

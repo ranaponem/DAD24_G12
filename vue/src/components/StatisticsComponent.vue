@@ -5,12 +5,10 @@ import { Line, Pie, Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, ArcElement, PointElement, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import axios from 'axios';
 
-// Register necessary Chart.js components
 ChartJS.register(Title, Tooltip, Legend, LineElement, ArcElement, PointElement, CategoryScale, LinearScale, BarElement);
 
 const statisticsStore = useStatisticsStore();
 
-// ===== PROFIT DATA =====
 const chartData = ref({
         labels: [],
         datasets: [{
@@ -31,7 +29,7 @@ const pieChartData = ref({
         labels: ['Singleplayer', 'Multiplayer'],
         datasets: [
                 {
-                        backgroundColor: ['#4CAF50', '#FF5722'], // Green for singleplayer, orange for multiplayer
+                        backgroundColor: ['#4CAF50', '#FF5722'], 
                         data: [0, 0], 
                 },
         ],
@@ -93,18 +91,18 @@ const updateGraph = async () => {
         }
 };
 
-// ===== TOTAL USERS DATA =====
+
 const selectedUsersTimePeriod = ref('this_year');
 const totalUsers = ref(0);
 const topUsers = ref();
-// Top 5 Users Chart Data
+
 const topUsersData = ref({
-        labels: ['User 1', 'User 2', 'User 3', 'User 4', 'User 5'], // Replace with dynamic user names
+        labels: ['User 1', 'User 2', 'User 3', 'User 4', 'User 5'], 
         datasets: [
                 {
                         label: 'Total Spent (€)',
-                        data: [500, 400, 300, 200, 100], // Replace with dynamic spending values
-                        backgroundColor: ['#FFD700', '#FFC300', '#FFB000', '#FFA500', '#FF8C00'], // Gradient-like colors
+                        data: [500, 400, 300, 200, 100], 
+                        backgroundColor: ['#FFD700', '#FFC300', '#FFB000', '#FFA500', '#FF8C00'], 
                         borderWidth: 1,
                         borderRadius: 5,
                 },
@@ -143,7 +141,7 @@ const getUsers = async () => {
 };
 
 
-// ===== TOTAL GAMES DATA =====
+
 const selectedGamesTimePeriod = ref('this_year');
 const totalGames = ref(0);
 const singlePlayer = ref(0);
@@ -156,7 +154,7 @@ const getTotalGames = async (timeRange) => {
         try {
                 const response = await axios.get('/statistics/total-games', { params });
                 console.log('RESPONSE = ', response)
-                totalGames.value = response.data.total_games || 0; // Assuming the response has `total_games`
+                totalGames.value = response.data.total_games || 0; 
                 singlePlayer.value = response.data.games_by_type.singleplayer || 0;
                 multiPlayer.value = response.data.games_by_type.multiplayer || 0;
 
@@ -166,8 +164,8 @@ const getTotalGames = async (timeRange) => {
                         labels: ['Singleplayer', 'Multiplayer'],
                         datasets: [
                                 {
-                                        backgroundColor: ['#4CAF50', '#FF5722'], // Green for singleplayer, orange for multiplayer
-                                        data: [singlePlayer.value, multiPlayer.value], // Default values
+                                        backgroundColor: ['#4CAF50', '#FF5722'], 
+                                        data: [singlePlayer.value, multiPlayer.value], 
                                 },
                         ],
                 };
@@ -178,14 +176,14 @@ const getTotalGames = async (timeRange) => {
         }
 };
 
-// Fetch data when component mounts
+
 onMounted(() => {
         updateGraph();
         getUsers();
-        getTotalGames('this_year'); // Default time range for games
+        getTotalGames('this_year'); 
 });
 
-// Watch for changes in dropdowns
+
 const handleProfitTimePeriodChange = () => {
         updateGraph();
 };
@@ -299,8 +297,8 @@ const handleGamesTimePeriodChange = () => {
                                                                         callbacks: {
                                                                                 label: function(context) {
                                                                                         const userIndex = context.dataIndex;
-                                                                                        const fullName = topUsersData.labels[userIndex]; // Use the name from the data
-                                                                                        return `${fullName}: ${context.raw}€`;  // Full name with amount spent
+                                                                                        const fullName = topUsersData.labels[userIndex]; 
+                                                                                        return `${fullName}: ${context.raw}€`;  
                                                                                 }
                                                                         }
                                                                 }
@@ -310,14 +308,14 @@ const handleGamesTimePeriodChange = () => {
                                                                         beginAtZero: true,
                                                                         ticks: {
                                                                                 callback: function(value) {
-                                                                                        return `${value}€`; // Add € sign to X-axis labels
+                                                                                        return `${value}€`; 
                                                                                 }
                                                                         }
                                                                 },
                                                                 y: {
                                                                         ticks: {
                                                                                 callback: function(value, index) {
-                                                                                        return topUsersData.labels[index];  // Display nickname on Y-axis
+                                                                                        return topUsersData.labels[index];  
                                                                                 }
                                                                         }
                                                                 }

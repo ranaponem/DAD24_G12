@@ -15,7 +15,6 @@ function resetGame() {
 }
 
 function showTipsPopup() {
-  // Logic to display tips popup
 }
 
 onMounted(() => {

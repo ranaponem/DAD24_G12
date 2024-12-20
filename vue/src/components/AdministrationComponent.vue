@@ -2,16 +2,20 @@
 import { onMounted, ref, computed } from 'vue';
 import { useUsersStore } from '@/stores/users';
 import {useRouter} from 'vue-router';
+import { useAuthStore } from "@/stores/auth";
 
+const storeAuth = useAuthStore()
 const router = useRouter();
 const usersStore = useUsersStore();
 const allUsers = ref([]);
 const meta = ref();
 const pageNum = ref(1);
 const totalPages = ref(1);
-const selectedScope = ref('Players'); // Default to "Players"
-const isSpinning = ref(false);  // Track if the button is spinning
+const selectedScope = ref('Players'); 
+const isSpinning = ref(false); 
 const userId = ref();
+const showDeleteConfirm = ref(false);
+const userToDelete = ref(null);
 
 const fetchUsers = async () => {
         try {
@@ -30,8 +34,19 @@ const fetchUsers = async () => {
 const changeUserBlockedState = async (id) => {
         try {
                 console.log(id)
-                userId.value = id;  // Set the userId to the clicked user's ID
+                userId.value = id;  
                 const response = await usersStore.changeUserBlockedState(userId.value);
+                fetchUsers();
+        } catch (error) {
+                console.error('Error changing blocked state for user:', error);
+        }
+};
+
+const deleteUser = async (id) => {
+        try {
+                console.log(id)
+                userId.value = id;  
+                const response = await usersStore.deleteUser(userId.value);
                 fetchUsers();
         } catch (error) {
                 console.error('Error changing blocked state for user:', error);
@@ -51,38 +66,26 @@ const handlePageChange = () => {
         }, 700);
 };
 
-// Handle switching between Players and Admins
 const handleButtonClick = () => {
-        if (isSpinning.value) return; // Prevent click if already spinning
+        if (isSpinning.value) return; 
         isSpinning.value = true;
         selectedScope.value = selectedScope.value === 'Players' ? 'Admins' : 'Players';
-        pageNum.value = 1; // Reset to first page on switch
+        pageNum.value = 1; 
         fetchUsers();
         setTimeout(() => {
                 isSpinning.value = false;
-        }, 500); // Match the duration of the animation (1 second)
+        }, 500); 
 };
 
-onMounted(() => {
-        // Check if the 'scope' query parameter exists, otherwise default to 'Players'
-        const scopeFromQuery = router.currentRoute.value.query.scope || 'Players';
-        selectedScope.value = scopeFromQuery;
-
-        // Fetch users based on the selected scope
-        fetchUsers();
-});
-
-// Dynamically update headers based on selected scope
 const getHeaders = computed(() => {
         if (selectedScope.value === 'Players') {
                 return ['Nickname', 'Name', 'Email', 'Brain Coins', 'Blocked'];
         } else {
-                return ['Nickname', 'Name', 'Email']; // Hide Brain Coins and Blocked for Admins
+                return ['Nickname', 'Name', 'Email']; 
         }
 });
 
 
-// Add this in the <script setup> section
 const currentColor = computed(() => 
         selectedScope.value === 'Players' ? 'primary' : 'secondary-light'
 );
@@ -98,6 +101,31 @@ const currentTextColor = computed(() =>
 const createAdmin = () => {
         router.push({ path: '/createadmin' });
 };
+
+const confirmDelete = (id) => {
+    userToDelete.value = id;
+    showDeleteConfirm.value = true;
+};
+
+const cancelDelete = () => {
+    userToDelete.value = null;
+    showDeleteConfirm.value = false;
+};
+
+const proceedDelete = async () => {
+    if (userToDelete.value) {
+        await deleteUser(userToDelete.value);
+    }
+    cancelDelete();
+};
+
+onMounted(() => {
+        const scopeFromQuery = router.currentRoute.value.query.scope || 'Players';
+        selectedScope.value = scopeFromQuery;
+
+        fetchUsers();
+});
+
 </script>
 
 <template>
@@ -105,8 +133,8 @@ const createAdmin = () => {
                 <!-- Title -->
                 <h1
                         :class="[
-                        'text-3xl font-bold text-gray-900 sm:text-4xl mb-4 mt-8',
-                        selectedScope === 'Players' ? 'text-primary' : 'text-secondary-light'
+                                'text-3xl font-bold text-gray-900 sm:text-4xl mb-4 mt-8',
+                                selectedScope === 'Players' ? 'text-primary' : 'text-secondary-light'
                         ]"
                 >
                         Administration Table
@@ -116,8 +144,8 @@ const createAdmin = () => {
                 <div class="flex items-center justify-center space-x-4 mt-2 mb-6">
                         <span
                                 :class="[
-                                'text-xl font-semibold cursor-pointer',
-                                selectedScope === 'Players' ? 'text-primary' : 'text-gray-500'
+                                        'text-xl font-semibold cursor-pointer',
+                                        selectedScope === 'Players' ? 'text-primary' : 'text-gray-500'
                                 ]"
                                 @click="selectedScope !== 'Players' && handleButtonClick"
                         >
@@ -125,9 +153,9 @@ const createAdmin = () => {
                         </span>
                         <button
                                 :class="[
-                                'w-16 h-16 p-2 rounded-full focus:outline-none transition-all duration-200',
-                                selectedScope === 'Players' ? 'bg-primary hover:bg-primary-light' : 'bg-secondary-light hover:bg-secondary',
-                                { 'animate-spin': isSpinning }
+                                        'w-16 h-16 p-2 rounded-full focus:outline-none transition-all duration-200',
+                                        selectedScope === 'Players' ? 'bg-primary hover:bg-primary-light' : 'bg-secondary-light hover:bg-secondary',
+                                        { 'animate-spin': isSpinning }
                                 ]"
                                 @click="handleButtonClick"
                                 class="cursor-pointer"
@@ -145,8 +173,8 @@ const createAdmin = () => {
                         </button>
                         <span
                                 :class="[
-                                'text-xl font-semibold cursor-pointer',
-                                selectedScope === 'Admins' ? 'text-secondary-light' : 'text-gray-500'
+                                        'text-xl font-semibold cursor-pointer',
+                                        selectedScope === 'Admins' ? 'text-secondary-light' : 'text-gray-500'
                                 ]"
                                 @click="selectedScope !== 'Admins' && handleButtonClick"
                         >
@@ -156,8 +184,8 @@ const createAdmin = () => {
                         <button
                                 v-if="selectedScope === 'Admins'"
                                 :class="[
-                                'absolute right-1/3 px-4 py-2 text-white rounded-lg',
-                                selectedScope === 'Admins' ? 'bg-secondary-light hover:bg-secondary-dark' : ''
+                                        'absolute right-1/3 px-4 py-2 text-white rounded-lg',
+                                        selectedScope === 'Admins' ? 'bg-secondary-light hover:bg-secondary-dark' : ''
                                 ]"
                                 @click="createAdmin"
                         >
@@ -173,12 +201,20 @@ const createAdmin = () => {
                                                         v-for="(header, index) in getHeaders"
                                                         :key="index"
                                                         :class="[
-                                                        'px-4 py-2 text-xl text-stone-900',
-                                                        selectedScope === 'Players' ? 'bg-primary' : 'bg-secondary-light'
+                                                                'px-4 py-2 text-xl text-stone-900',
+                                                                selectedScope === 'Players' ? 'bg-primary' : 'bg-secondary-light'
                                                         ]"
                                                         :style="{ minWidth: '150px' }"
                                                 >
                                                         {{ header }}
+                                                </th>
+                                                <th
+                                                        :class="[
+                                                                'px-4 py-2 text-xl text-stone-900',
+                                                                selectedScope === 'Players' ? 'bg-primary' : 'bg-secondary-light'
+                                                        ]"
+                                                        style="min-width: 100px;"
+                                                >
                                                 </th>
                                         </tr>
                                 </thead>
@@ -210,29 +246,63 @@ const createAdmin = () => {
                                                                 fill="red"
                                                                 viewBox="0 0 24 24"
                                                                 class="w-6 h-6 mx-auto cursor-pointer"
-                                                                @click="changeUserBlockedState(user.id)" 
+                                                                @click="changeUserBlockedState(user.id)"
                                                         >
                                                                 <path
                                                                 d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm5-11a1 1 0 0 0-1-1H8a1 1,0,0,0,0,2h8a1,1,0,0,0,1-1z"
                                                         />
                                                         </svg>
-
                                                         <svg
                                                                 v-else
                                                                 xmlns="http://www.w3.org/2000/svg"
                                                                 fill="green"
                                                                 viewBox="0 0 24 24"
                                                                 class="w-6 h-6 mx-auto cursor-pointer"
-                                                                @click="changeUserBlockedState(user.id)"  
+                                                                @click="changeUserBlockedState(user.id)"
                                                         >
                                                                 <path
                                                                 d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm-1-5.414l7.707-7.707a1,1,0,0,0-1.414-1.414L11 14.586 7.707 11.293a1,1,0,1,0-1.414,1.414L11 16.586a1,1,0,0,0,1.414,0z"
                                                         />
                                                         </svg>
                                                 </td>
+                                                <!-- New Delete Button -->
+                                                <td class="px-4 py-2">
+                                                        <button
+                                                                v-if="storeAuth.user && user.id !== storeAuth.user.id"
+                                                                class="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                                                                @click="confirmDelete(user.id)"
+                                                        >
+                                                                DELETE
+                                                        </button>
+                                                </td>
                                         </tr>
                                 </tbody>
                         </table>
+                </div>
+
+                <!-- Confirm Delete Popup -->
+                <div
+                        v-if="showDeleteConfirm"
+                        class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                >
+                        <div class="bg-white rounded-lg shadow-lg p-6 w-96">
+                                <h2 class="text-xl font-bold mb-4">Confirm Delete</h2>
+                                <p>Are you sure you want to delete this user?</p>
+                                <div class="flex justify-end mt-6">
+                                        <button
+                                                class="bg-gray-300 text-black px-4 py-2 rounded-lg mr-4 hover:bg-gray-400"
+                                                @click="cancelDelete"
+                                        >
+                                                Cancel
+                                        </button>
+                                        <button
+                                                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                                                @click="proceedDelete"
+                                        >
+                                                YES
+                                        </button>
+                                </div>
+                        </div>
                 </div>
 
                 <!-- Pagination -->
