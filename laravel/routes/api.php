@@ -52,7 +52,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/users/{user}', [UserController::class, 'show'])
         ->can('view', 'user');
 
-    # Update my user 
+    # Update my user
     Route::put('/users/me', [UserController::class, 'update']);
 
     # Update my password
@@ -125,3 +125,6 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
 # Get All
 Route::get('/games', [GameController::class, 'index']);
+
+# Get Top 5
+Route::get('/topfivemultiplayer', [MultiplayerGamePlayedController::class, 'topfiveplayers']);

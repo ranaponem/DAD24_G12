@@ -5,16 +5,18 @@ import { useGamesStore } from '@/stores/games';
 const gamesStore = useGamesStore();
 const allGames = ref([]);
 const selectedType = ref('time'); 
+const selectedGameType = ref('S'); 
 const selectedBoard = ref('ALL'); 
-const selectedScope = ref('GLOBAL'); // Keep track of scope
-const isSpinning = ref(false);  // Track if the button is spinning
+const selectedScope = ref('GLOBAL'); 
+const isSpinning = ref(false);  
 
-// Fetch the scoreboard based on the selected type
+
 const fetchScoreboard = async () => {
-        allGames.value = await gamesStore.getScoreboard(selectedType.value, selectedBoard.value, selectedScope.value);
+        allGames.value = await gamesStore.getScoreboard(selectedType.value, selectedBoard.value, selectedScope.value, selectedGameType.value);
+        console.log(allGames)
 };
 
-// Utility function to get board type
+
 const getBoardType = (boardId) => {
         const boardTypes = {
                 1: '3x4',
@@ -24,7 +26,7 @@ const getBoardType = (boardId) => {
         return boardTypes[boardId] || 'Unknown';
 };
 
-// Utility function to get game type
+
 const getGameType = (type) => {
         const gameTypes = {
                 S: 'Single Player',
@@ -33,7 +35,7 @@ const getGameType = (type) => {
         return gameTypes[type] || 'Unknown';
 };
 
-// Utility function to format date
+
 const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString('en-GB', {
@@ -47,31 +49,30 @@ const formatDate = (dateString) => {
         });
 };
 
-watch([selectedType, selectedBoard, selectedScope], fetchScoreboard);
+watch([selectedType, selectedBoard, selectedScope, selectedGameType], fetchScoreboard);
 
 onMounted(() => {
         fetchScoreboard();
 });
 
-// Handle button click and toggle the scope
+
 const handleButtonClick = () => {
-        if (isSpinning.value) return; // Prevent click if already spinning
+        if (isSpinning.value) return; 
         isSpinning.value = true;
-        selectedScope.value = selectedScope.value === 'GLOBAL' ? 'PERSONAL' : 'GLOBAL'; // Toggle scope
+        selectedScope.value = selectedScope.value === 'GLOBAL' ? 'PERSONAL' : 'GLOBAL'; 
         setTimeout(() => {
                 isSpinning.value = false;
-        }, 500); // Match the duration of the animation (1 second)
+        }, 500); 
 };
 </script>
 
 <template>
         <div class="flex flex-col items-center justify-center flex-grow">
-                <!-- Title -->
                 <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl mb-4 mt-8 text-primary">
                         Scoreboard
                 </h1>
-                <!-- GLOBAL/PERSONAL Switch -->
-                <div class="flex items-center justify-center space-x-4 mt-2 mb-6">
+
+                <div v-if="selectedGameType === 'S'" class="flex items-center justify-center space-x-4 mt-2 mb-6">
                         <span 
                                 :class="['text-xl font-semibold', selectedScope === 'GLOBAL' ? 'text-primary' : 'text-gray-500']">
                                 GLOBAL
@@ -98,9 +99,8 @@ const handleButtonClick = () => {
                                 PERSONAL
                         </span>
                 </div>
-                <div class="flex flex-row items-center justify-between w-fit">
 
-                        <!-- Filter by Board Type -->
+                <div v-if="selectedGameType === 'S'" class="flex flex-row items-center justify-between w-fit">
                         <div class="bg-white p-4 mb-4 mr-4 flex items-center space-x-2 rounded-3xl border-2 border-primary justify-center">
                                 <label for="boardType" class="text-lg font-bold text-gray-700 mr-2">Filter by Board Type:</label>
                                 <select
@@ -115,7 +115,6 @@ const handleButtonClick = () => {
                                 </select>
                         </div>
 
-                        <!-- Toggle buttons for "TIME" and "TURNS" -->
                         <div class="bg-white p-4 mb-4 flex items-center space-x-2 rounded-3xl border-2 border-primary justify-center">
                                 <button
                                         :class="['px-6 py-2 rounded-full text-lg', selectedType === 'time' ? 'bg-primary text-white' : 'bg-white hover:bg-primary-light text-gray-800']"
@@ -130,15 +129,56 @@ const handleButtonClick = () => {
                                         TURNS
                                 </button>
                         </div>
-
                 </div>
-                <!-- Scoreboard Table -->
+
+                <div class="ml-4 bg-white p-4 mb-4 flex items-center space-x-2 rounded-3xl border-2 border-primary justify-center">
+                        <button
+                                :class="['px-6 py-2 rounded-full text-lg', selectedGameType === 'S' ? 'bg-primary text-white' : 'bg-white hover:bg-primary-light text-gray-800']"
+                                @click="selectedGameType = 'S'"
+                        >
+                                SinglePlayer
+                        </button>
+                        <button
+                                :class="['px-6 py-2 rounded-full text-lg', selectedGameType === 'M' ? 'bg-primary text-white' : 'bg-white hover:bg-primary-light text-gray-800']"
+                                @click="selectedGameType = 'M'"
+                        >
+                                MultiPlayer
+                        </button>
+                </div>
+
                 <div class="flex items-center justify-center w-full mb-8">
-                        <table class="table-auto border-collapse w-3/4 text-center rounded-lg overflow-hidden">
+                        <table
+                                v-if="selectedGameType === 'M'"
+                                class="table-auto border-collapse w-3/4 text-center rounded-lg overflow-hidden"
+                        >
                                 <thead>
                                         <tr class="bg-white">
-                                                <th 
-                                                        v-for="(header, index) in ['User', 'Board Type', 'Game Type', 'Turns Taken', 'Time Spent', 'Finished At']" 
+                                                <th class="bg-primary px-4 py-2 text-xl text-stone-900">Top 5</th>
+                                                <th class="bg-primary px-4 py-2 text-xl text-stone-900">User Nickname</th>
+                                                <th class="bg-primary px-4 py-2 text-xl text-stone-900">Total Games Won</th>
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                        <tr
+                                                v-for="(game, index) in allGames.data"
+                                                :key="index"
+                                                :class="index % 2 === 0 ? 'bg-white' : 'bg-stone-200'"
+                                                class="transition-colors duration-200 text-black"
+                                        >
+                                                <td class="px-4 py-2">{{ index+1 }}</td>
+                                                <td class="px-4 py-2">{{ game.user ? game.user.nickname : '-----' }}</td>
+                                                <td class="px-4 py-2">{{ game.total_wins }}</td>
+                                        </tr>
+                                </tbody>
+                        </table>
+
+                        <table
+                                v-else
+                                class="table-auto border-collapse w-3/4 text-center rounded-lg overflow-hidden"
+                        >
+                                <thead>
+                                        <tr class="bg-white">
+                                                <th v-for="(header, index) in ['User', 'Board Type', 'Game Type', 'Turns Taken', 'Time Spent', 'Finished At']" 
                                                         :key="index" 
                                                         class="bg-primary px-4 py-2 text-xl text-stone-900"
                                                         :style="{ minWidth: '150px' }"
@@ -148,13 +188,15 @@ const handleButtonClick = () => {
                                         </tr>
                                 </thead>
                                 <tbody>
-                                        <tr 
-                                                v-for="(game, index) in allGames" 
-                                                :key="game.id" 
+                                        <tr
+                                                v-for="(game, index) in allGames"
+                                                :key="game.id"
                                                 :class="index % 2 === 0 ? 'bg-white' : 'bg-stone-200'"
                                                 class="transition-colors duration-200 text-black"
                                         >
-                                                <td class="px-4 py-2">{{ game.won_by ? game.won_by.nickname : game.created_by.nickname }}</td>
+                                                <td class="px-4 py-2">
+                                                        {{ game.won_by ? game.won_by.nickname : (game.created_by ? game.created_by.nickname : '-----') }}
+                                                </td>
                                                 <td class="px-4 py-2">{{ getBoardType(game.board.id) }}</td>
                                                 <td class="px-4 py-2">{{ getGameType(game.type) }}</td>
                                                 <td class="px-4 py-2">{{ game.total_turns }}</td>
@@ -164,7 +206,6 @@ const handleButtonClick = () => {
                                 </tbody>
                         </table>
                 </div>
-
         </div>
 </template>
 

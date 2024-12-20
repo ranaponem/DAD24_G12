@@ -37,51 +37,46 @@ export const useGamesStore = defineStore('games', () => {
                 }
         };
 
-const getScoreboard = async (sorting, board, scope) => {
-    let params = new URLSearchParams(); // Declare params outside
+        const getScoreboard = async (sorting, board, scope, type) => {
+                let params = new URLSearchParams(); 
 
-    if (scope === "GLOBAL") {
-        params.append('score_type', sorting); // Always include score_type
+                if(type !== "M"){
 
-        if (board !== "ALL") {
-            params.append('board', board); // Add board filter if it's not "ALL"
-        }
+                        params.append('score_type', sorting); 
+                        params.append('type', type); 
 
-        try {
-            const responseAllGames = await axios.get('/games', { params });
-            allGames.value = responseAllGames.data.data;
-            return allGames.value;
-        } catch (e) {
-            storeError.setErrorMessages(
-                e.response.data.message,
-                e.response.data.errors,
-                e.response.status,
-                'Error fetching Scoreboard'
-            );
-            return [];
-        }
-    } else if (scope === "PERSONAL") {
-        params.append('score_type', sorting); // Always include score_type
+                        if (board !== "ALL") {
+                                params.append('board', board); 
+                        }
+                }
 
-        if (board !== "ALL") {
-            params.append('board', board); // Add board filter if it's not "ALL"
-        }
+                try {
+                        let responseAllGames;
+                        if (type === "S"){
+                                if (scope === "GLOBAL") {
+                                        responseAllGames = await axios.get('/games', { params });
+                                }else if(scope === "PERSONAL"){
+                                        responseAllGames = await axios.get('/games/my', { params });
+                                }
 
-        try {
-            const responseAllGames = await axios.get('/games/my', { params });
-            allGames.value = responseAllGames.data.data;
-            return allGames.value;
-        } catch (e) {
-            storeError.setErrorMessages(
-                e.response.data.message,
-                e.response.data.errors,
-                e.response.status,
-                'Error fetching Scoreboard'
-            );
-            return [];
-        }
-    }
-};
+                                allGames.value = responseAllGames.data.data;
+                        }else if(type === "M"){
+                                responseAllGames = await axios.get('/topfivemultiplayer', { params });
+
+                                allGames.value = responseAllGames.data;
+                        }
+
+                        return allGames.value;
+                } catch (e) {
+                        storeError.setErrorMessages(
+                                e.response.data.message,
+                                e.response.data.errors,
+                                e.response.status,
+                                'Error fetching Scoreboard'
+                        );
+                        return [];
+                }
+        };
 
         return { myGames, meta, getHistory, getScoreboard };
 })
