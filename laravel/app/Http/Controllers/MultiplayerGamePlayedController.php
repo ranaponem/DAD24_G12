@@ -22,12 +22,12 @@ class MultiplayerGamePlayedController extends Controller
     public function topfiveplayers()
     {
         $topWinners = MultiplayerGamePlayed::where('player_won', 1)
-            ->selectRaw('user_id, SUM(player_won) as total_wins') // Select user_id and sum of player_won
-            ->groupBy('user_id') // Group by user_id
-            ->orderByDesc('total_wins') // Order by the total_wins in descending order
-            ->whereHas('user') // Ensure the user relationship exists
-            ->with('user') // Eager load the 'user' relationship
-            ->limit(5) // Limit to top 5
+            ->selectRaw('user_id, SUM(player_won) as total_wins')
+            ->groupBy('user_id')
+            ->orderByDesc('total_wins')
+            ->whereHas('user')
+            ->with('user')
+            ->limit(5)
             ->get();
 
         return new MultiplayerGamePlayedResource($topWinners);

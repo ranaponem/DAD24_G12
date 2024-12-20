@@ -91,7 +91,6 @@ export const useMemoryGameStore = defineStore('memory', () => {
     clearInterval(timer.value);
   };
 
-  // Function to handle card clicks
   const onCardClick = (index) => {
     const card = cards.value[index];
   
@@ -187,9 +186,7 @@ export const useMemoryGameStore = defineStore('memory', () => {
     return cardIndices;
   };
 
-  // Function to close the popup (if applicable)
   const closeTipsPopup = () => {
-    // Implementation based on tipsPopupVisible or similar reactive state
   };
 
   return {

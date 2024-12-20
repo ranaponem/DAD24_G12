@@ -45,7 +45,7 @@ const changeUserBlockedState = async (id) => {
 const deleteUser = async (id) => {
         try {
                 console.log(id)
-                userId.value = id;  // Set the userId to the clicked user's ID
+                userId.value = id;  
                 const response = await usersStore.deleteUser(userId.value);
                 fetchUsers();
         } catch (error) {
@@ -81,7 +81,7 @@ const getHeaders = computed(() => {
         if (selectedScope.value === 'Players') {
                 return ['Nickname', 'Name', 'Email', 'Brain Coins', 'Blocked'];
         } else {
-                return ['Nickname', 'Name', 'Email']; // Hide Brain Coins and Blocked for Admins
+                return ['Nickname', 'Name', 'Email']; 
         }
 });
 

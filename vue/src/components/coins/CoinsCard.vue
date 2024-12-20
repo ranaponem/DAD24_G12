@@ -37,16 +37,16 @@
   const storeCoins = useCoinsStore()
   const storeAuth = useAuthStore()
 
-  const userBalance = ref(0) // Ref to hold the resolved balance
+  const userBalance = ref(0) 
 
   const fetchUserBalance = async () => {
-    const balance = await storeAuth.userBalance() // Await the resolved balance
+    const balance = await storeAuth.userBalance() 
     if (balance !== false) {
       userBalance.value = balance
     }
   }
 
-  // Fetch the balance when the component is mounted
+  
   onMounted(() => {
     fetchUserBalance()
   })

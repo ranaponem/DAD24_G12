@@ -23,7 +23,6 @@ const fetchHistory = async () => {
         }
 };
 
-// Utility function to get board type
 const getBoardType = (boardId) => {
         const boardTypes = {
                 1: '3x4',
@@ -33,7 +32,6 @@ const getBoardType = (boardId) => {
         return boardTypes[boardId] || 'Unknown';
 };
 
-// Utility function to get game type
 const getGameType = (type) => {
         const gameTypes = {
                 S: 'Single Player',
@@ -42,7 +40,6 @@ const getGameType = (type) => {
         return gameTypes[type] || 'Unknown';
 };
 
-// Utility function to format date
 const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString('en-GB', {
@@ -71,12 +68,12 @@ const handlePageChange = () => {
 };
 
 watch(selectedBoard, () => {
-  console.log("Selected board changed to:", selectedBoard.value); // Debugging
+  console.log("Selected board changed to:", selectedBoard.value); 
   fetchHistory();
 });
 
 onMounted(() => {
-        fetchHistory(); // Fetch data on page load
+        fetchHistory(); 
 });
 
 </script>
