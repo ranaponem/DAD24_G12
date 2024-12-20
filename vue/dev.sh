@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SESSION_NAME="my-bun-session"
+SESSION_NAME="vue-dev"
 
 # Function to start the screen session
 start() {

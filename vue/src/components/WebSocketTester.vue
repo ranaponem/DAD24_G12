@@ -11,9 +11,10 @@ const send = () => {
     socket.emit('echo', message.value)
 }
 
-socket.on('echo', (message) => {
+socket.on('taesNotification', (message) => {
     responseData.value = message
 })
+
 </script>
 
 <template>

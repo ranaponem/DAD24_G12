@@ -9,10 +9,15 @@ use App\Models\Game;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
-use Log;
+use Illuminate\Support\Facades\Http;
 
 class TransactionController extends Controller
 {
+    //REMOVE BEFORE PRODUCTION
+    private const DEBUG = false;
+    private const externalApp = "https://dad-202425-payments-api.vercel.app/api/debit";
+    private const websocket = "ws:/192.168.0.211:8086";
+
     /**
      * Display a listing of the resource.
      */
@@ -39,12 +44,12 @@ class TransactionController extends Controller
     {
         return new TransactionResource($transaction);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreTransactionRequest $request)
-    {   
+    {
         $user = $request->user();
         $requestValidated = $request->validated();
 
@@ -53,13 +58,28 @@ class TransactionController extends Controller
         if ($user->brain_coins_balance + (int)$requestValidated['brain_coins'] < 0)
             return response()->json(['message' => 'Insufficient balance.'], 400);
 
+        if (TransactionController::DEBUG && $requestValidated['type'] == Transaction::TYPE_PURCHASE) {
+            $response = Http::post(TransactionController::externalApp, [
+                'type' => $requestValidated['payment_type'],
+                'reference' => $requestValidated['payment_ref'],
+                'value' => $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO,
+            ]);
+
+            if ($response->clientError())
+                return response()->json(['message'=> $response->json()['message']],400);
+            
+            if ($response->serverError())
+                return response()->json(['message'=> 'Something went wrong when trying to reach the payment server', 500]);
+        }
+
         $transaction = DB::transaction(function () use ($user, $requestValidated, $time) {
             $transaction = new Transaction();
             $transaction->fill($requestValidated);
 
             switch ($requestValidated['type']) {
                 case Transaction::TYPE_PURCHASE:
-                    $transaction->euros = $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO;
+                    $transaction->euros = $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO;                    
+
                     break;
                 case Transaction::TYPE_INTERNAL:
                     $game = Game::where('id', $requestValidated['game_id'])->first();
@@ -74,8 +94,8 @@ class TransactionController extends Controller
             $transaction->transaction_datetime = $time;
             $transaction->save();
 
-            $user->brain_coins_balance += (int)$requestValidated['brain_coins']; 
-                            
+            $user->brain_coins_balance += (int)$requestValidated['brain_coins'];
+
             $user->save();
 
             return $transaction;
@@ -101,6 +121,13 @@ class TransactionController extends Controller
                 return $query;
             });
         }
+        if ($request->nickname){
+            $nickname = $request->nickname;
+            $query->with('user')->whereHas('user', function($query) use ($nickname) {
+                $query->where('nickname', 'LIKE', '%' . $nickname . '%');
+            });
+        }
+        $query->orderBy('transaction_datetime', 'desc');
         return $query;
     }
 }

@@ -34,16 +34,16 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $request, User $user): bool
+    public function update(User $user): bool
     {
-        return $request->type == User::TYPE_ADMIN || $request->id == $user->id;
+        return true;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user): bool
     {
-        return ($user->type == User::TYPE_ADMIN && $user->id != $model->id) || $user->id == $model->id;
+        return $user->type == User::TYPE_PLAYER;
     }
 }

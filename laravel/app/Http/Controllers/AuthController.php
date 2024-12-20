@@ -29,10 +29,19 @@ class AuthController extends Controller
     {
         $this->purgeExpiredTokens();
         $credentials = $request->validated();
+
         if (!Auth::attempt($credentials)) {
             return response()->json(['message' => 'Unauthorized'], 401);
         }
-        $token = $request->user()->createToken('authToken', ['*'], now()->addHours(2))->plainTextToken;
+
+        if ($request->user()->blocked == User::BLOCKED)
+            return response()->json(['message' => 'Account blocked'], 403);
+
+
+        $token = $request?->remember_me == true ?
+            $request->user()->createToken('authToken', ['*'], now()->addDays(30))->plainTextToken
+            : $request->user()->createToken('authToken', ['*'], now()->addHours(2))->plainTextToken;
+
         return response()->json(['token' => $token]);
     }
 
@@ -48,7 +57,9 @@ class AuthController extends Controller
         // Revokes current token and creates a new token
         $this->purgeExpiredTokens();
         $this->revokeCurrentToken($request->user());
-        $token = $request->user()->createToken('authToken', ['*'], now()->addHours(2))->plainTextToken;
+        $token = $request?->remember_me == 1 ?
+            $request->user()->createToken('authToken', ['*'], now()->addDays(30))->plainTextToken
+            : $request->user()->createToken('authToken', ['*'], now()->addHours(2))->plainTextToken;
         return response()->json(['token' => $token]);
     }
 }
