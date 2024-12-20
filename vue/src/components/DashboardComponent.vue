@@ -12,7 +12,7 @@ const goToHistory = () => {
 };
 
 const goToSelectGameMode = () => {
-        router.push('/selectGameMode');
+        router.push('/games');
 };
 
 const goToScoreboard = () => {
