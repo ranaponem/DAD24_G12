@@ -1,11 +1,6 @@
 import DashboardComponent from '@/components/DashboardComponent.vue'
-import LoginPage from '@/components/LoginPage.vue'
-import AdministrationComponent from '@/components/AdministrationComponent.vue'
-import StatisticsComponent from '@/components/StatisticsComponent.vue'
-import TransactionsComponent from '@/components/TransactionsComponent.vue'
-import ScoreboardComponent from '@/components/ScoreboardComponent.vue'
-import HistoryComponent from '@/components/HistoryComponent.vue'
-import ProfilePage from '@/components/profile/ProfilePage.vue'
+import MemoryGame from '@/components/games/MemoryGame.vue'
+import GamesHome from '@/components/games/GamesHome.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import RegisterPage from '@/components/RegisterPage.vue'
@@ -63,8 +58,21 @@ const router = createRouter({
                         path: '/administration',
                         name: 'administration',
                         component: AdministrationComponent
+                },
+                {
+                  path: '/games',
+                  name: 'games',
+                  component: GamesHome
+                },
+                {
+                  path: '/games/play',
+                  name: 'MemoryGame',
+                  props: route => ({
+                    rows: parseInt(route.params.rows),
+                    cols: parseInt(route.params.cols),
+                  }),
+                  component: MemoryGame,
                 }
-
         ]
 })
 router.beforeEach(async (to, from, next) => {
