@@ -1,5 +1,6 @@
 import HomeComponent from '@/components/HomeComponent.vue'
 import LaravelTester from '@/components/LaravelTester.vue'
+import ProfilePage from '@/components/profile/ProfilePage.vue'
 import WebSocketTester from '@/components/WebSocketTester.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
@@ -16,6 +17,7 @@ const router = createRouter({
       children: [
         {
           path: 'laravel',
+          name: 'login',
           component: LaravelTester
         },
         {
@@ -23,6 +25,11 @@ const router = createRouter({
           component: WebSocketTester
         }
       ]
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: ProfilePage
     }
   ]
 })

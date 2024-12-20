@@ -21,9 +21,18 @@ class UpdateGameRequest extends FormRequest
      */
     public function rules(): array
     {
-      return [
-        "status" => "string|in:PL,E,I",
-        "total_time" => "nullable|numeric|min:0"
+      $rules = [
+        "status" => "required|string|in:PL,E,I",
       ];
+
+      if ($this->input("status") == "E") { 
+        array_merge($rules, [
+          "total_time" => "required|decimal|min:0",
+          "total_turns_winner" => "required|numeric|min:1",
+          "winner_user_id" => "numeric|exists:users,id",
+        ]);
+      }
+
+      return $rules;
     }
 }
