@@ -29,126 +29,133 @@ class MultiplayerGamePlayedController extends Controller
     public function topfiveplayers()
     {
         $topWinners = MultiplayerGamePlayed::where('player_won', 1)
-            ->selectRaw('user_id, SUM(player_won) as total_wins')
+            ->selectRaw('user_id, COUNT(*) as total_wins')
             ->groupBy('user_id')
             ->orderByDesc('total_wins')
-            ->whereHas('user')
-            ->with('user')
+            ->has('user')
             ->limit(5)
             ->get();
 
-        return new MultiplayerGamePlayedResource($topWinners);
+        return response()->json([
+            'data' => $topWinners->map(function ($winner) {
+                return [
+                    'user_id' => $winner->user_id,
+                    'total_wins' => $winner->total_wins,
+                    'user' => $winner->user->only(['id', 'nickname']),
+                ];
+            }),
+        ]);
     }
 
-  public function store(CreateMultiplayerGameRequest $request)
-  {
-    $requestValidated = $request->validated();
-    $player2 = $request->user();
+    public function store(CreateMultiplayerGameRequest $request)
+    {
+        $requestValidated = $request->validated();
+        $player2 = $request->user();
 
-    if ($player2->brain_coins_balance - 5 < 0)
-      return response()->json(['message' => 'Insufficient balance.'], 400);
-    
-    $player1 = User::find($requestValidated['player_1_id']);
-    if ($player1->brain_coins_balance - 5 < 0)
-      return response()->json(['message' => 'Insufficient balance for player 2.'], 400);
+        if ($player2->brain_coins_balance - 5 < 0)
+        return response()->json(['message' => 'Insufficient balance.'], 400);
 
-    $time = now();
+        $player1 = User::find($requestValidated['player_1_id']);
+        if ($player1->brain_coins_balance - 5 < 0)
+        return response()->json(['message' => 'Insufficient balance for player 2.'], 400);
 
-    $game = DB::transaction(function () use ($requestValidated, $player2, $player1, $time) {
+        $time = now();
 
-      $game = new Game();
-      $game->fill($requestValidated);
-      $game->began_at = $time;
-      $game->type = Game::TYPE_MULTIPLAYER;
-      $game->created_user_id = $player2->id;
-      
-      $game->status = Game::STATUS_PROGRESS;
+        $game = DB::transaction(function () use ($requestValidated, $player2, $player1, $time) {
 
-      $game->save();
+            $game = new Game();
+            $game->fill($requestValidated);
+            $game->began_at = $time;
+            $game->type = Game::TYPE_MULTIPLAYER;
+            $game->created_user_id = $player2->id;
 
-      $transaction1 = $this->gameTransaction($player2->id, $game->id, Transaction::TYPE_INTERNAL, -5);
-      $transaction2 = $this->gameTransaction($player1->id, $game->id, Transaction::TYPE_INTERNAL, -5);
-      $this->makeMultiplayerRecord($player2->id, $game->id);
-      $this->makeMultiplayerRecord($player1->id, $game->id);
+            $game->status = Game::STATUS_PROGRESS;
 
-      $player2->brain_coins_balance += $transaction1->brain_coins;
-      $player2->save(); 
-      
-      $player1->brain_coins_balance += $transaction2->brain_coins;
-      $player1->save();
+            $game->save();
 
-      return $game;
-    });
+            $transaction1 = $this->gameTransaction($player2->id, $game->id, Transaction::TYPE_INTERNAL, -5);
+            $transaction2 = $this->gameTransaction($player1->id, $game->id, Transaction::TYPE_INTERNAL, -5);
+            $this->makeMultiplayerRecord($player2->id, $game->id);
+            $this->makeMultiplayerRecord($player1->id, $game->id);
 
-    $game->began_at = $time->isoFormat("YYYY-mm-DD HH:MM:ss");
+            $player2->brain_coins_balance += $transaction1->brain_coins;
+            $player2->save();
 
-    return new GameResource($game);
-  }
+            $player1->brain_coins_balance += $transaction2->brain_coins;
+            $player1->save();
 
-  public function update(UpdateMultiplayerGameRequest $request, Game $game)
-  {
-    $user = $request->user();
-    $policy = new MultiplayerGamePlayedPolicy();
+            return $game;
+        });
 
-    if (!$policy->update($user, $game)) {
-        return abort(403, 'This action is unauthorized.');
+        $game->began_at = $time->isoFormat("YYYY-mm-DD HH:MM:ss");
+
+        return new GameResource($game);
     }
-    
-    if($game->status == $request->status)
-      return response()->json(['message' => 'Game is already in that state'], 400);
 
-    if($game->winner_user_id != null && ($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED))
-      return response()->json(['message' => 'Cannot update ended or interrupted games'], 400);
+    public function update(UpdateMultiplayerGameRequest $request, Game $game)
+    {
+        $user = $request->user();
+        $policy = new MultiplayerGamePlayedPolicy();
 
-    $requestValidated = $request->validated();
+        if (!$policy->update($user, $game)) {
+            return abort(403, 'This action is unauthorized.');
+        }
 
-    $multiPlayerRecord = MultiplayerGamePlayed::where('game_id', $game->id)->where('user_id', $user->id)->first();
+        if($game->status == $request->status)
+        return response()->json(['message' => 'Game is already in that state'], 400);
 
-    $game = DB::transaction(function () use ($user, $game, $multiPlayerRecord, $requestValidated) {
-      if($requestValidated['my_win'] == 1) {
-        $game->fill($requestValidated);
-        $game->ended_at = now();
-        $game->total_time = Carbon::parse($game->ended_at)->diffInSeconds(Carbon::parse($game->began_at));
+        if($game->winner_user_id != null && ($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED))
+        return response()->json(['message' => 'Cannot update ended or interrupted games'], 400);
 
-        $game->winner_user_id = $user->id;
-        $game->save();
+        $requestValidated = $request->validated();
 
-        $multiPlayerRecord->player_won = 1;
+        $multiPlayerRecord = MultiplayerGamePlayed::where('game_id', $game->id)->where('user_id', $user->id)->first();
 
-        $transaction = $this->gameTransaction($user->id, $game->id, Transaction::TYPE_INTERNAL, 7);
-        
-        $user->brain_coins_balance += $transaction->brain_coins;
-        $user->save();
-      }
+        $game = DB::transaction(function () use ($user, $game, $multiPlayerRecord, $requestValidated) {
+            if($requestValidated['my_win'] == 1) {
+                $game->fill($requestValidated);
+                $game->ended_at = now();
+                $game->total_time = Carbon::parse($game->ended_at)->diffInSeconds(Carbon::parse($game->began_at));
 
-      if ($requestValidated['status'] == Game::STATUS_ENDED)
-        $multiPlayerRecord->pairs_discovered = $requestValidated['pairs'];
-      
-      $multiPlayerRecord->save();
-      return $game;
-    });
+                $game->winner_user_id = $user->id;
+                $game->save();
 
-    return new GameResource($game);
-  }
-  
-  private function gameTransaction($userId, $gameId, $type, $amount)
-  {
-    $transaction = new Transaction();
-    $transaction->user_id = $userId;
-    $transaction->game_id = $gameId;
-    $transaction->type = $type;
-    $transaction->brain_coins = $amount;
-    $transaction->transaction_datetime = now();
+                $multiPlayerRecord->player_won = 1;
 
-    $transaction->save();
-    return $transaction;
-  }
+                $transaction = $this->gameTransaction($user->id, $game->id, Transaction::TYPE_INTERNAL, 7);
 
-  private function makeMultiplayerRecord($userId, $gameId) { 
-      $multiplayer_game = new MultiplayerGamePlayed();
-      $multiplayer_game->user_id = $userId;
-      $multiplayer_game->game_id = $gameId;
-      $multiplayer_game->player_won = 0;
-      $multiplayer_game->save();
-  }
+                $user->brain_coins_balance += $transaction->brain_coins;
+                $user->save();
+            }
+
+            if ($requestValidated['status'] == Game::STATUS_ENDED)
+            $multiPlayerRecord->pairs_discovered = $requestValidated['pairs'];
+
+            $multiPlayerRecord->save();
+            return $game;
+        });
+
+        return new GameResource($game);
+    }
+
+    private function gameTransaction($userId, $gameId, $type, $amount)
+    {
+        $transaction = new Transaction();
+        $transaction->user_id = $userId;
+        $transaction->game_id = $gameId;
+        $transaction->type = $type;
+        $transaction->brain_coins = $amount;
+        $transaction->transaction_datetime = now();
+
+        $transaction->save();
+        return $transaction;
+    }
+
+    private function makeMultiplayerRecord($userId, $gameId) {
+        $multiplayer_game = new MultiplayerGamePlayed();
+        $multiplayer_game->user_id = $userId;
+        $multiplayer_game->game_id = $gameId;
+        $multiplayer_game->player_won = 0;
+        $multiplayer_game->save();
+    }
 }
