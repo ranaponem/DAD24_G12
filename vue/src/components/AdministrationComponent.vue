@@ -33,7 +33,6 @@ const fetchUsers = async () => {
 
 const changeUserBlockedState = async (id) => {
         try {
-                console.log(id)
                 userId.value = id;  
                 const response = await usersStore.changeUserBlockedState(userId.value);
                 fetchUsers();
@@ -44,7 +43,6 @@ const changeUserBlockedState = async (id) => {
 
 const deleteUser = async (id) => {
         try {
-                console.log(id)
                 userId.value = id;  
                 const response = await usersStore.deleteUser(userId.value);
                 fetchUsers();

@@ -5,11 +5,11 @@ import { useErrorStore } from "./error";
 
 export const useGamesStore = defineStore('games', () => {
 
-        const storeError = useErrorStore()
+    const storeError = useErrorStore()
 
-        const myGames = ref([]) 
-        const allGames = ref([]) 
-        const meta = ref({})
+    const myGames = ref([])
+    const allGames = ref([])
+    const meta = ref({})
 
         const getHistory = async (pageNum, board) => {
                 let params = new URLSearchParams(); 

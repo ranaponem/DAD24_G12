@@ -22,7 +22,6 @@ const user = ref({
 
 const submit = async () => {
         const result = await storeAdmin.createAdmin(user.value)
-        console.log(result)
         if(result)
         router.push({ name: 'administration' , query: { scope: 'Admins' }})
 }

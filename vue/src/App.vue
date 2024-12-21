@@ -6,7 +6,6 @@ import { computed } from 'vue';
 
 const storeAuth = useAuthStore()
 const isAdmin = computed(() => storeAuth.userType === 'A');
-console.log(isAdmin)
 </script>
 
 <template>
@@ -28,7 +27,7 @@ console.log(isAdmin)
                 active-class="text-blue-600 font-semibold">
                 Play
               </RouterLink>
-              <RouterLink to="/scoreboards"
+              <RouterLink to="/scoreboard"
                 class="text-gray-900 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium transition-colors"
                 active-class="text-blue-600 font-semibold">
                 Scoreboards

@@ -7,13 +7,14 @@ export const useBoardStore = defineStore('boards', () => {
     const storeError = useErrorStore()
     const boards = ref([])
 
-    const fetchBoards = async () => {
+    const fetchBoards = async () => { 
         storeError.resetMessages()
         const response = await axios.get('boards')
         boards.value = response.data.data
     }
 
     return{
-        boards,fetchBoards
+        boards,
+        fetchBoards
     }
 })

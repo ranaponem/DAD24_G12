@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, nextTick, onActivated, onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import FormsInput from '../ui/forms/FormsInput.vue';
@@ -25,6 +25,7 @@ const submit = async () => {
 
 const isEmpty = (field) => user.value[field] && user.value[field].length > 0 ? 0 : 1
 const isPasswordValid = computed(() => user.value.password && user.value['password'].length >= 3 ? 0 : 1)
+
 </script>
 
 <template>
@@ -35,7 +36,7 @@ const isPasswordValid = computed(() => user.value.password && user.value['passwo
             <form class="mt-6">
                 <div class="mb-4 space-y-3">
                     <FormsInput v-model="user.email" placeholder="example@mail.pt" input-type="email"
-                        :error-message="null" label="Email:" :as-errors="isEmpty('email')" />
+                        :error-message="null" label="Email:" :as-errors="isEmpty('email')" :autofocus="true" />
                     <FormsInput v-model="user.password" input-type="password"
                         :error-message="user.password != null && isPasswordValid == 1 ? 'Password must have at least 3 characters' : null" label="Password:" :as-errors="isPasswordValid" />
                     <div v-show="error" class="text-sm italic text-red-600 ps-5">Email or password incorrect</div>

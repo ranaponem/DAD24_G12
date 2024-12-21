@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GameTypeRequest;
+use App\Models\MultiplayerGamePlayed;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use App\Http\Resources\GameResource;
 use App\Http\Requests\CreateGameRequest;
 use App\Http\Requests\UpdateGameRequest;
 use Carbon\Carbon;
+use PhpParser\Node\Expr\AssignOp\Mul;
 
 class GameController extends Controller
 {
@@ -47,74 +49,66 @@ class GameController extends Controller
         return $attributesResponse ?? GameResource::collection($query->paginate(10));
     }
 
-    public function store(CreateGameRequest $request)
-    {
-        $requestValidated = $request->validated();
-        $user = $request->user();
+  public function store(CreateGameRequest $request)
+  {
+    $requestValidated = $request->validated();
+    $user = $request->user();
+   
+    $payment = 0;
+    if ($requestValidated['board_id'] != 1)
+      $payment = 1;
 
-        if ($requestValidated['board_id'] != 1 && $user->brain_coins_balance - 1 < 0)
-        return response()->json(['message' => 'Insufficient balance.'], 400);
+    if ($user->brain_coins_balance - $payment < 0)
+      return response()->json(['message' => 'Insufficient balance.'], 400);
 
-        $time = Carbon::now();
 
-        $game = DB::transaction(function () use ($requestValidated, $user, $time) {
+    $time = now();
 
-            $game = new Game();
-            $game->fill($requestValidated);
-            $game->created_user_id = $user->id;
-            $game->began_at = $time;
+    $game = DB::transaction(function () use ($requestValidated, $user, $time, $payment) {
 
-            match ($game->type) {
-                Game::TYPE_SINGLEPLAYER => $game->status = Game::STATUS_PROGRESS,
-                Game::TYPE_MULTIPLAYER => $game->status = Game::STATUS_PENDING,
-            };
+      $game = new Game();
+      $game->fill($requestValidated);
+      $game->created_user_id = $user->id;
+      $game->type = Game::TYPE_SINGLEPLAYER;
+      
+      $game->status = Game::STATUS_PROGRESS;
+      $game->began_at = $time;
 
-            $game->save();
+      $game->save();
 
-            if ($game->board_id != 1) {
-
-                $transaction = new Transaction();
-                $transaction->user_id = $user->id;
-                $transaction->game_id = $game->id;
-                $transaction->type = Transaction::TYPE_INTERNAL;
-                $transaction->brain_coins = -1;
-                $transaction->transaction_datetime = $time;
-
-                $transaction->save();
-
-                $user->brain_coins_balance -= 1;
-
-                $user->save();
-            }
-
-            return $game;
-        });
+      if($payment != 0){
+        $transaction = $this->gameTransaction($user->id, $game->id, Transaction::TYPE_INTERNAL, -$payment, $time);
+    
+        $user->brain_coins_balance += $transaction->brain_coins;
+        $user->save(); 
+      }
+      
+      return $game;
+    });
 
         $game->began_at = $time->isoFormat("YYYY-mm-DD HH:MM:ss");
 
         return new GameResource($game);
     }
 
-    public function update(UpdateGameRequest $request, Game $game)
-    {
-        if($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED)
-        return response()->json(['message' => 'Cannot update ended or interrupted games'], 400);
+  public function update(UpdateGameRequest $request, Game $game)
+  {
+    if($game->status == $request->status)
+      return response()->json(['message' => 'Game is already in that state'], 400);
+
+    if($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED)
+      return response()->json(['message' => 'Cannot update ended or interrupted games'], 400);
 
         if($game->status == Game::STATUS_PROGRESS && $request->status == Game::STATUS_PENDING)
         return response()->json(['message' => 'Cannot put a game in progress back to pending'], 400);
 
-        $requestValidated = $request->validated();
-        $game->fill($requestValidated);
-        $game->ended_at = Carbon::now();
+    $requestValidated = $request->validated();
 
-        if ($game->type == Game::TYPE_MULTIPLAYER) {
-            if ($requestValidated['winner_user_id'] == null) {
-                return response()->json(['message'=> 'Multiplayer games need a winner.'], 400);
-            }
-            $game->winner_user_id = $request->winner_user_id;
-        }
+    $game->fill($requestValidated);
+    $game->ended_at = now();
+    $game->total_time = Carbon::parse($game->ended_at)->diffInSeconds(Carbon::parse($game->began_at));
 
-        $game->save();
+    $game->save();
 
         return new GameResource($game);
     }
@@ -171,4 +165,17 @@ class GameController extends Controller
         // Ordering by most recent or by oldest if score ordering was parsed
         $query->orderBy('ended_at', $isOrderedByScore ? 'asc' : 'desc');
     }
+  
+  private function gameTransaction($userId, $gameId, $type, $amount, $time)
+  {
+    $transaction = new Transaction();
+    $transaction->user_id = $userId;
+    $transaction->game_id = $gameId;
+    $transaction->type = $type;
+    $transaction->brain_coins = $amount;
+    $transaction->transaction_datetime = $time;
+
+    $transaction->save();
+    return $transaction;
+  }
 }

@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
-class CreateGameRequest extends FormRequest
+class CreateMultiplayerGameRequest extends FormRequest
 {
   /**
    * Determine if the user is authorized to make this request.
@@ -23,6 +24,7 @@ class CreateGameRequest extends FormRequest
   {
     return [
       'board_id' => 'required|integer|exists:boards,id',
+      'player_1_id' => ["required", "integer", Rule::exists('users','id')->whereNot('id', auth()->user()->id)],
     ];
   }
 

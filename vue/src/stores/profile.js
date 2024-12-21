@@ -30,7 +30,7 @@ export const useProfileStore = defineStore('user', () => {
                 headers: {"Content-Type": "multipart/form-data"},
                 withCredentials: true
             })
-            storeAuth.user.value = responseProfile.data.data
+            storeAuth.user = responseProfile.data.data
             toast({
                 title: 'Profile update',
                 description: 'Profile has been updated successfully.',
