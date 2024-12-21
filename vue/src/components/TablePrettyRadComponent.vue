@@ -64,11 +64,9 @@ export default {
         methods: {
                 formatValue(value) {
                         if (typeof value === "object" && value !== null) {
-                                // Handle nested objects (e.g., { nickname: 'John' })
                                 return value.nickname || value.name || JSON.stringify(value);
                         }
                         if (typeof value === "string" && !isNaN(Date.parse(value))) {
-                                // Handle date strings
                                 return this.formatDate(value);
                         }
                         return value || "Unknown";

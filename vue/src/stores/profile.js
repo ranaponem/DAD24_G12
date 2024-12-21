@@ -18,7 +18,6 @@ export const useProfileStore = defineStore('user', () => {
         try {
             const formData = new FormData()
 
-            //add image if any to user
             if (userPayload.image)
                 formData.append('photo_image', userPayload.image)
             

@@ -23,7 +23,11 @@ class UserController extends Controller
     }
 
     public function index() {
-        return UserResource::collection(User::paginate(20));
+        return UserResource::collection(User::where('type', 'P')->paginate(20));
+    }
+
+    public function indexAdmins() {
+        return UserResource::collection(User::where('type', 'A')->paginate(20));
     }
 
     public function show(User $user) {

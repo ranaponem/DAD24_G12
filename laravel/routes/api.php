@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\BoardController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\MultiplayerGamePlayedController;
 use App\Http\Controllers\TransactionController;
 use App\Models\User;
@@ -38,18 +39,22 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/auth/refreshtoken', [AuthController::class,'refreshtoken']);
     Route::get('/users/me', [UserController::class, 'showMe']);
 
-    # Get All
+    # Get All Players
     Route::get('/users', [UserController::class, 'index'])
         ->can('viewAny', User::class);
 
     # Special Get (balance only)
     Route::get('/users/mybalance', [UserController::class, 'showMyBalance']);
 
+    # Get All
+    Route::get('/admins', [UserController::class, 'indexAdmins'])
+        ->can('viewAny', User::class);
+
     # Get
     Route::get('/users/{user}', [UserController::class, 'show'])
         ->can('view', 'user');
 
-    # Update my user 
+    # Update my user
     Route::put('/users/me', [UserController::class, 'update']);
 
     # Update my password
@@ -58,6 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Delete me
     Route::delete('/users/me', [UserController::class, 'destroy'])
         ->can('delete', User::class);
+
 
 
     # Get My
@@ -111,7 +117,23 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::delete('/users/{user}', [AdminController::class, 'destroy'])
         ->can('admin-destroy', 'user');
 
+
+    # Get All
+    Route::get('/statistics/profit', [StatisticsController::class, 'totalProfit'])
+        ->can('isAdmin');
+
+    Route::get('/statistics/detailed-profit', [StatisticsController::class, 'detailedProfit'])
+        ->can('isAdmin');
+
+    Route::get('/statistics/total-users', [StatisticsController::class, 'totalUsers'])
+        ->can('isAdmin');
+
+    Route::get('/statistics/total-games', [StatisticsController::class, 'totalGames'])
+        ->can('isAdmin');
 });
 
 # Get All
 Route::get('/games', [GameController::class, 'index']);
+
+# Get Top 5
+Route::get('/topfivemultiplayer', [MultiplayerGamePlayedController::class, 'topfiveplayers']);

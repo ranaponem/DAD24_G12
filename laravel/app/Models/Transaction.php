@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Transaction extends Model
-{ 
+{
     # 10 COINS = 1 EURO
     public const EURO_TO_COIN_RATIO = 10.0;
     public const TYPE_BONUS = 'B';

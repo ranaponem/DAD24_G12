@@ -40,7 +40,7 @@ import { useErrorStore } from '@/stores/error';
   const storeCoins = useCoinsStore()
   const storeAuth = useAuthStore()
 
-  const userBalance = ref(0) // Ref to hold the resolved balance
+  const userBalance = ref(0) 
 
   const fetchUserBalance = async () => {
     const balance = await storeAuth.updateUserBalance() // Await the resolved balance
@@ -49,7 +49,7 @@ import { useErrorStore } from '@/stores/error';
     }
   }
 
-  // Fetch the balance when the component is mounted
+  
   onMounted(() => {
     fetchUserBalance()
   })
