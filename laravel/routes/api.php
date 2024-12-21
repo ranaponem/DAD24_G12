@@ -85,7 +85,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Create Multiplayer game
     Route::post('/multiplayer', [MultiplayerGamePlayedController::class, 'store'])
         ->can('create', MultiplayerGamePlayed::class);
-    
+
     # Update multiplayer
     Route::patch('/multiplayer/{game}', [MultiplayerGamePlayedController::class, 'update']);
 
@@ -134,6 +134,8 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
 # Get All
 Route::get('/games', [GameController::class, 'index']);
+
+Route::get('/gamesended', [GameController::class, 'indexEndedGames']);
 
 # Get Top 5
 Route::get('/topfivemultiplayer', [MultiplayerGamePlayedController::class, 'topfiveplayers']);

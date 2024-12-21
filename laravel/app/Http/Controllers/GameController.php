@@ -29,21 +29,37 @@ class GameController extends Controller
     return $attributesResponse ?? GameResource::collection($query->paginate(10));
   }
 
-  public function showMy(GameTypeRequest $request)
-  {
-    $userId = $request->user()->id;
-    $type = $request->query('type') ?? Game::TYPE_SINGLEPLAYER;
+    public function indexEndedGames(GameTypeRequest $request)
+    {
+        // Filter games that have ended and are associated with a valid user
+        $query = Game::where('status', GAME::STATUS_ENDED)
+        ->whereHas('creator');
+
+        // Apply additional filters using readAttributes if present
+        $attributesResponse = $this->readAttributes($request, $query);
+
+        // Return the response from readAttributes or a paginated collection of games
+        return $attributesResponse ?? GameResource::collection($query->paginate(10));
+    }
+
+    public function showMy(GameTypeRequest $request)
+    {
+        $userId = $request->user()->id;
+        $type = $request->query('type') ?? Game::TYPE_SINGLEPLAYER;
 
         $query = Game::when($type == Game::TYPE_SINGLEPLAYER, function ($query) use ($userId) {
             return $query->where('created_user_id', $userId)->where('type', Game::TYPE_SINGLEPLAYER);
-        })->when($type == 'A' || $type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
+        })
+            ->when($type == 'A' || $type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
                 return $query->where('created_user_id', $userId)
-                    ->orWhereHas('multiplayer_games_played', function ($subQuery) use ($userId) {
+                    ->orWhereHas('multiplayerGamesPlayed', function ($subQuery) use ($userId) {
                         $subQuery->where('user_id', $userId);
                     });
-            })->when($type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
+            })
+            ->when($type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
                 return $query->where('type', Game::TYPE_MULTIPLAYER);
-            })->where('status', Game::STATUS_ENDED);
+            })
+            ->where('status', Game::STATUS_ENDED);  // Always filter by ended games
 
     $attributesResponse = $this->readAttributes($request, $query);
 
@@ -145,10 +161,31 @@ class GameController extends Controller
       $dateStart = $request->query('date_start');
       $parsedDateStart = \DateTime::createFromFormat('d-m-Y', $dateStart);
 
-      if ($parsedDateStart)
-        $query->where('ended_at', '>=', $parsedDateStart->format('Y-m-d'));
-      else
-        return response()->json(['message' => 'Invalid \'date_start\' date format: must be DD-mm-YYYY'], 402);
+        // Filter by a start date (all games played after it are gotten)
+        if($request->has('date_start')){
+            $dateStart = $request->query('date_start');
+            $parsedDateStart = \DateTime::createFromFormat('d-m-Y', $dateStart);
+
+            if($parsedDateStart)
+            $query->where('ended_at', '>=', $parsedDateStart->format('Y-m-d'));
+
+            else
+            return response()->json(['message' => 'Invalid \'date_start\' date format: must be DD-mm-YYYY'], 402);
+        }
+
+        // Filter by end date (all games played before it are gotten)
+        if($request->has('date_end')){
+            $dateEnd = $request->query('date_end');
+            $parsedDateEnd = \DateTime::createFromFormat('d-m-Y', $dateEnd);
+
+            if($parsedDateEnd)
+            $query->where('ended_at', '<=', $parsedDateEnd->format('Y-m-d').' 23:59:59');
+
+            else
+            return response()->json(['message' => 'Invalid \'date_end\' date format: must be DD-mm-YYYY'], 402);
+        }
+        // Ordering by most recent or by oldest if score ordering was parsed
+        $query->orderBy('began_at', $isOrderedByScore ? 'asc' : 'desc');
     }
 
     // Filter by end date (all games played before it are gotten)
