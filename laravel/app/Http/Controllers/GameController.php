@@ -20,8 +20,7 @@ class GameController extends Controller
     public function index(GameTypeRequest $request)
     {
         // Filter games that have ended and are associated with a valid user
-        $query = Game::where('status', Game::STATUS_ENDED)
-            ->whereHas('creator'); // Only include games with a valid user relationship
+        $query = Game::whereHas('creator');
 
         // Apply additional filters using readAttributes if present
         $attributesResponse = $this->readAttributes($request, $query);
@@ -38,8 +37,10 @@ class GameController extends Controller
         $query = Game::when($type == Game::TYPE_SINGLEPLAYER, function ($query) use ($userId) {
             return $query->where('created_user_id', $userId)->where('type', Game::TYPE_SINGLEPLAYER);
         })->when($type == 'A' || $type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
-                return $query->where('winner_user_id', $userId)
-                    ->orWhere('created_user_id', $userId);
+                return $query->where('created_user_id', $userId)
+                    ->orWhereHas('multiplayer_games_played', function ($subQuery) use ($userId) {
+                        $subQuery->where('user_id', $userId);
+                    });
             })->when($type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
                 return $query->where('type', Game::TYPE_MULTIPLAYER);
             })->where('status', Game::STATUS_ENDED);
@@ -49,66 +50,66 @@ class GameController extends Controller
         return $attributesResponse ?? GameResource::collection($query->paginate(10));
     }
 
-  public function store(CreateGameRequest $request)
-  {
-    $requestValidated = $request->validated();
-    $user = $request->user();
-   
-    $payment = 0;
-    if ($requestValidated['board_id'] != 1)
-      $payment = 1;
+    public function store(CreateGameRequest $request)
+    {
+        $requestValidated = $request->validated();
+        $user = $request->user();
 
-    if ($user->brain_coins_balance - $payment < 0)
-      return response()->json(['message' => 'Insufficient balance.'], 400);
+        $payment = 0;
+        if ($requestValidated['board_id'] != 1)
+        $payment = 1;
+
+        if ($user->brain_coins_balance - $payment < 0)
+        return response()->json(['message' => 'Insufficient balance.'], 400);
 
 
-    $time = now();
+        $time = now();
 
-    $game = DB::transaction(function () use ($requestValidated, $user, $time, $payment) {
+        $game = DB::transaction(function () use ($requestValidated, $user, $time, $payment) {
 
-      $game = new Game();
-      $game->fill($requestValidated);
-      $game->created_user_id = $user->id;
-      $game->type = Game::TYPE_SINGLEPLAYER;
-      
-      $game->status = Game::STATUS_PROGRESS;
-      $game->began_at = $time;
+            $game = new Game();
+            $game->fill($requestValidated);
+            $game->created_user_id = $user->id;
+            $game->type = Game::TYPE_SINGLEPLAYER;
 
-      $game->save();
+            $game->status = Game::STATUS_PROGRESS;
+            $game->began_at = $time;
 
-      if($payment != 0){
-        $transaction = $this->gameTransaction($user->id, $game->id, Transaction::TYPE_INTERNAL, -$payment, $time);
-    
-        $user->brain_coins_balance += $transaction->brain_coins;
-        $user->save(); 
-      }
-      
-      return $game;
-    });
+            $game->save();
+
+            if($payment != 0){
+                $transaction = $this->gameTransaction($user->id, $game->id, Transaction::TYPE_INTERNAL, -$payment, $time);
+
+                $user->brain_coins_balance += $transaction->brain_coins;
+                $user->save();
+            }
+
+            return $game;
+        });
 
         $game->began_at = $time->isoFormat("YYYY-mm-DD HH:MM:ss");
 
         return new GameResource($game);
     }
 
-  public function update(UpdateGameRequest $request, Game $game)
-  {
-    if($game->status == $request->status)
-      return response()->json(['message' => 'Game is already in that state'], 400);
+    public function update(UpdateGameRequest $request, Game $game)
+    {
+        if($game->status == $request->status)
+        return response()->json(['message' => 'Game is already in that state'], 400);
 
-    if($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED)
-      return response()->json(['message' => 'Cannot update ended or interrupted games'], 400);
+        if($game->status == Game::STATUS_ENDED || $game->status == Game::STATUS_INTERRUPTED)
+        return response()->json(['message' => 'Cannot update ended or interrupted games'], 400);
 
         if($game->status == Game::STATUS_PROGRESS && $request->status == Game::STATUS_PENDING)
         return response()->json(['message' => 'Cannot put a game in progress back to pending'], 400);
 
-    $requestValidated = $request->validated();
+        $requestValidated = $request->validated();
 
-    $game->fill($requestValidated);
-    $game->ended_at = now();
-    $game->total_time = Carbon::parse($game->ended_at)->diffInSeconds(Carbon::parse($game->began_at));
+        $game->fill($requestValidated);
+        $game->ended_at = now();
+        $game->total_time = Carbon::parse($game->ended_at)->diffInSeconds(Carbon::parse($game->began_at));
 
-    $game->save();
+        $game->save();
 
         return new GameResource($game);
     }
@@ -165,17 +166,17 @@ class GameController extends Controller
         // Ordering by most recent or by oldest if score ordering was parsed
         $query->orderBy('ended_at', $isOrderedByScore ? 'asc' : 'desc');
     }
-  
-  private function gameTransaction($userId, $gameId, $type, $amount, $time)
-  {
-    $transaction = new Transaction();
-    $transaction->user_id = $userId;
-    $transaction->game_id = $gameId;
-    $transaction->type = $type;
-    $transaction->brain_coins = $amount;
-    $transaction->transaction_datetime = $time;
 
-    $transaction->save();
-    return $transaction;
-  }
+    private function gameTransaction($userId, $gameId, $type, $amount, $time)
+    {
+        $transaction = new Transaction();
+        $transaction->user_id = $userId;
+        $transaction->game_id = $gameId;
+        $transaction->type = $type;
+        $transaction->brain_coins = $amount;
+        $transaction->transaction_datetime = $time;
+
+        $transaction->save();
+        return $transaction;
+    }
 }

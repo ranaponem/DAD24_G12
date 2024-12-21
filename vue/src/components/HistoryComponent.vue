@@ -11,7 +11,7 @@ const totalPages = ref(1);
 const fetchHistory = async () => {
         try {
                 await gamesStore.getHistory(pageNum.value, selectedBoard.value);
-
+                console.log(gamesStore.myGames)
                 if (gamesStore.meta?.data?.meta?.last_page) {
                         totalPages.value = gamesStore.meta.data.meta.last_page;
                 } else {
@@ -40,6 +40,15 @@ const getGameType = (type) => {
         return gameTypes[type] || 'Unknown';
 };
 
+const getStatusType = (status) => {
+        const statusTypes = {
+                E: 'Ended',
+                I: 'Interrupted',
+                PE: 'Pending',
+                PL: 'Progress'
+        };
+        return statusTypes[status] || 'Unknown';
+};
 const formatDate = (dateString) => {
         const date = new Date(dateString);
         return date.toLocaleString('en-GB', {
@@ -102,7 +111,7 @@ onMounted(() => {
                                 <thead>
                                         <tr class="bg-white">
                                                 <th 
-                                                        v-for="(header, index) in ['Board Type', 'Game Type', 'Turns Taken', 'Time Spent', 'Finished At']" 
+                                                        v-for="(header, index) in ['Board Type', 'Game Type', 'Turns Taken', 'Time Spent', 'Finished At', 'Status']" 
                                                         :key="index" 
                                                         class="bg-primary px-4 py-2 text-xl text-stone-900"
                                                         :style="{ minWidth: '150px' }"
@@ -131,6 +140,7 @@ onMounted(() => {
                                                 <td class="px-4 py-2">{{ game.total_turns }}</td>
                                                 <td class="px-4 py-2">{{ game.total_time }}s</td>
                                                 <td class="px-4 py-2">{{ formatDate(game.ended_at) }}</td>
+                                                <td class="px-4 py-2">{{ getStatusType(game.status) }}</td>
                                         </tr>
                                 </tbody>
                         </table>
