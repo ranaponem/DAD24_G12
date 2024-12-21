@@ -21,6 +21,12 @@ class AdminController extends Controller
 
         $user->save();
 
+        if($request->hasFile('photo_image')) {
+            $path = $request->photo_image->store(AdminController::PHOTO_PATH, 'public');
+            $user->photo_filename = basename($path);
+            $user->save();
+        }
+
         return new UserResource($user);
     }
 

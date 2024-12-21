@@ -73,15 +73,15 @@ class MultiplayerGamePlayedController extends Controller
 
             $game->save();
 
-            $transaction1 = $this->gameTransaction($player2->id, $game->id, Transaction::TYPE_INTERNAL, -5);
-            $transaction2 = $this->gameTransaction($player1->id, $game->id, Transaction::TYPE_INTERNAL, -5);
+            $transaction1 = $this->gameTransaction($player1->id, $game->id, Transaction::TYPE_INTERNAL, -5);
+            $transaction2 = $this->gameTransaction($player2->id, $game->id, Transaction::TYPE_INTERNAL, -5);
             $this->makeMultiplayerRecord($player2->id, $game->id);
             $this->makeMultiplayerRecord($player1->id, $game->id);
 
-            $player2->brain_coins_balance += $transaction1->brain_coins;
+            $player2->brain_coins_balance += $transaction2->brain_coins;
             $player2->save();
 
-            $player1->brain_coins_balance += $transaction2->brain_coins;
+            $player1->brain_coins_balance += $transaction1->brain_coins;
             $player1->save();
 
             return $game;

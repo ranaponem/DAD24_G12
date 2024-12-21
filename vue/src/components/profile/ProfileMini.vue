@@ -30,7 +30,7 @@ const logout = async () => {
         <div v-if="storeAuth.user" class="text-xl text-black font-semibold">
             {{ storeAuth.userBalance }} BC
         </div>
-        <div v-if="storeAuth.user" class="relative">
+        <div v-if="storeAuth.user" class="relative w-fit">
             <button @click.prevent="showLinksMenu" class="flex items-center space-x-4">
                 <span class="truncate w-100 font-semibold text-lg text-gray-800 dark:text-gray-300 cursor-pointer">
                     {{storeAuth.userFirstLastName}}

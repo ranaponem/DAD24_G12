@@ -36,8 +36,8 @@ const isAdmin = authStore.userType == 'A';
                     class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                     Transactions
                 </RouterLink>
-                <RouterLink v-if="isAdmin" to="/statistics"
-                    class="w-full px-4 py-2 mt-6 text-white bg-secondary-light hover:bg-secondary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                <RouterLink to="/statistics"
+                    class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-primary-dark rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                     Statistics
                 </RouterLink>
                 <RouterLink v-if="isAdmin" to="/administration"

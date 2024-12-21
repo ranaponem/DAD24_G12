@@ -125,12 +125,11 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::get('/statistics/detailed-profit', [StatisticsController::class, 'detailedProfit'])
         ->can('isAdmin');
 
-    Route::get('/statistics/total-users', [StatisticsController::class, 'totalUsers'])
-        ->can('isAdmin');
-
-    Route::get('/statistics/total-games', [StatisticsController::class, 'totalGames'])
-        ->can('isAdmin');
 });
+
+Route::get('/statistics/total-users', [StatisticsController::class, 'totalUsers']);
+
+Route::get('/statistics/total-games', [StatisticsController::class, 'totalGames']);
 
 # Get All
 Route::get('/games', [GameController::class, 'index']);

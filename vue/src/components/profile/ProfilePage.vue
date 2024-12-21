@@ -25,10 +25,10 @@ onMounted(() => {
       <UpdateAccount @changeMode="changeMode" :inUpdateMode="inUpdateMode" />
       <div v-show="inUpdateMode" class="py-6 h-full w-2/5 border-y-0 border-x-2 border-black dark:border-white" />
       <ChangePassword :inUpdateMode="inUpdateMode" />
-      <div v-show="!inUpdateMode" class="py-6 h-full w-2/5 border-y-0 border-x-2 border-black
+      <div v-show="!inUpdateMode && storeAuth.userType == 'P'" class="py-6 h-full w-2/5 border-y-0 border-x-2 border-black
           dark:border-white" />
-      <CoinsCard v-show="!inUpdateMode" />
-      <div v-show="!inUpdateMode"
+      <CoinsCard v-show="!inUpdateMode && storeAuth.userType == 'P'" />
+      <div v-show="!inUpdateMode && storeAuth.userType == 'P'"
         class="py-6 h-fit w-2/5 border-y-0 border-x-2 border-black dark:border-white text-center items-center justify-center">
         <svg class="w-full h-20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <g id="SVGRepo_bgCarrier" stroke-width="0"></g>

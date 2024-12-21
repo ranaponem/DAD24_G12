@@ -97,7 +97,7 @@ const router = createRouter({
 
 router.beforeEach(async (to, from, next) => {
     const storeAuth = useAuthStore()
-    const anonymous = ['home', 'login', 'scoreboard', 'register', 'games', 'MemoryGame']
+    const anonymous = ['home', 'login', 'scoreboard', 'register', 'games', 'MemoryGame', 'statistics']
 
     if (anonymous.includes(to.name) || storeAuth.user)
         next()

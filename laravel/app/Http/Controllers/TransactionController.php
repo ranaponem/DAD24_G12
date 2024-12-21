@@ -76,7 +76,7 @@ class TransactionController extends Controller
             switch ($requestValidated['type']) {
                 case Transaction::TYPE_PURCHASE:
                     $transaction->euros = $requestValidated['brain_coins'] / Transaction::EURO_TO_COIN_RATIO;
-
+                    $transaction->payment_reference = $requestValidated['payment_ref'];
                     break;
                 case Transaction::TYPE_INTERNAL:
                     $game = Game::where('id', $requestValidated['game_id'])->first();

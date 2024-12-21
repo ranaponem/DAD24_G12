@@ -10,13 +10,14 @@ const userNickname = ref('');
 const transactionType = ref('ALL');
 const totalPages = ref(1);
 
-const isAdmin = authStore.userType === 'A';
+const isAdmin = authStore.userType == 'A';
 
 const fetchTransactions = async () => {
         try {
                 if (isAdmin) {
                         await transactionsStore.getTransactions(pageNum.value, userNickname.value, transactionType.value);
-                } else {
+                        console.log(transactionsStore.transactions)
+                    } else {
                         await transactionsStore.getMyTransactions(pageNum.value, transactionType.value);
                 }
 
@@ -46,6 +47,7 @@ const formatDate = (dateString) => {
 
 const getTransactionType = (type) => {
         const transactionTypes = {
+                ALL: 'All',
                 I: 'Internal',
                 P: 'Payment',
                 B: 'Bonus'
@@ -83,7 +85,7 @@ onMounted(() => {
     <div class="flex flex-col items-center justify-center flex-grow">
         <!-- Title -->
         <h1 class="text-3xl font-bold text-gray-900 sm:text-4xl mb-12 mt-8 text-primary">
-            My Transactions
+            {{ !isAdmin ? 'My' : getTransactionType(transactionType) }} Transactions
         </h1>
         <div class="flex flex-row items-center justify-between w-fit">
             <!-- Filter by Type -->
@@ -144,7 +146,7 @@ onMounted(() => {
                         :class="index % 2 === 0 ? 'bg-white' : 'bg-stone-200'"
                         class="transition-colors duration-200 text-black"
                     >
-                        <td v-if="isAdmin" class="px-4 py-2">{{ transaction.user.nickname }}</td>
+                        <td v-if="isAdmin" class="px-4 py-2">{{ transaction.user ? transaction.user.nickname : 'Deleted user' }}</td>
                         <td class="px-4 py-2">{{ getTransactionType(transaction.type) }}</td>
                         <td class="px-4 py-2 font-bold"
                             :class="transaction.brain_coins >= 0 ? 'text-green-600' : 'text-red-600'"

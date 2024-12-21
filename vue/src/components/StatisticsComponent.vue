@@ -1,13 +1,16 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useStatisticsStore } from '@/stores/statistics';
 import { Line, Pie, Bar } from 'vue-chartjs';
 import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, ArcElement, PointElement, CategoryScale, LinearScale, BarElement } from 'chart.js';
 import axios from 'axios';
+import { useAuthStore } from '../stores/auth';
 
 ChartJS.register(Title, Tooltip, Legend, LineElement, ArcElement, PointElement, CategoryScale, LinearScale, BarElement);
 
-const statisticsStore = useStatisticsStore();
+const statisticsStore = useStatisticsStore()
+const storeAuth = useAuthStore()
+const isAdmin = computed(() => storeAuth.userType === 'A')
 
 const chartData = ref({
         labels: [],
@@ -171,7 +174,8 @@ const getTotalGames = async (timeRange) => {
 
 
 onMounted(() => {
-        updateGraph();
+        if(isAdmin.value)
+                updateGraph();
         getUsers();
         getTotalGames('this_year'); 
 });
@@ -193,7 +197,7 @@ const handleGamesTimePeriodChange = () => {
 <template>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 p-4 h-screen">
                 <!-- Profit Card -->
-                <div class="col-span-1 md:col-span-1 bg-white p-4 rounded-lg shadow-md border-2 border-green-600 flex flex-col h-full">
+                <div v-if="isAdmin" class="col-span-1 md:col-span-1 bg-white p-4 rounded-lg shadow-md border-2 border-green-600 flex flex-col h-full">
                         <h2 class="text-2xl font-bold mb-4 text-green-600">Profit</h2>
 
                         <!-- Time Period Selector -->
@@ -269,7 +273,7 @@ const handleGamesTimePeriodChange = () => {
                                 </div>
 
                                 <!-- Top 5 Losers Chart inside Total Users Card -->
-                                <div class="flex flex-col items-center w-full mt-6">
+                                <div v-if="isAdmin" class="flex flex-col items-center w-full mt-6">
                                         <!-- Title centered above the chart -->
                                         <h2 class="text-2xl font-bold mb-4 text-blue-600 text-center">Top 5 Supporters</h2>
 

@@ -15,7 +15,7 @@ export const useAdminStore = defineStore('admin', () => {
                         const formData = new FormData()
 
                         if (admin.image)
-                        formData.append('photo_image', admin.image)
+                                formData.append('photo_image', admin.image)
 
                         formData.append('name', admin.name)
                         formData.append('email', admin.email)
