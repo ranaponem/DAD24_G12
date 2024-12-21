@@ -110,10 +110,12 @@ onActivated(() => {
             <h1 class="w-full bg-primary text-white py-4 px-6 rounded-t-lg font-bold text-center text-3xl">Game Lobby
             </h1>
             <table v-show="storeLobby.totalGames > 0" class="divide-y bg-gray-300 divide-gray-400">
-                <thead class="">
-                    <th class="w-1/2">Player</th>
-                    <th class="w-1/2">Board</th>
-                    <th class="w-auto"></th>
+                <thead>
+                    <tr>
+                        <th class="w-1/2">Player</th>
+                        <th class="w-1/2">Board</th>
+                        <th class="w-auto"></th>
+                    </tr>
                 </thead>
                 <tbody class="bg-gray-100">
                     <tr v-for="(game, index) in storeLobby.games" :key="index"
