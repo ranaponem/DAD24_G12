@@ -1,7 +1,10 @@
 <script setup>
-  import { useCoinsStore } from '@/stores/coins'
-  import { useAuthStore } from '@/stores/auth'
-  import { ref, onMounted } from 'vue';
+import { useCoinsStore } from '@/stores/coins'
+import { useAuthStore } from '@/stores/auth'
+import { ref, onMounted, computed } from 'vue';
+import { useErrorStore } from '@/stores/error';
+
+  const storeError = useErrorStore()
 
   const coinsQuantity = ref(0);
   const price = ref(coinsQuantity.value / 10);
@@ -62,7 +65,7 @@
 
 </script>
 <template>
-  <div class="w-full lf:w-1/3 h-full border-secondary-dark dark:border-secondary-light
+  <div class="w-full lg:w-3/5 h-full border-secondary-dark dark:border-secondary-light
   border-2 bg-gray-50 dark:bg-gray-800 shadow-lg rounded-lg
   overflow-hidden">
     <div
@@ -122,6 +125,7 @@
         <label class="text-sm text-gray-500 dark:text-gray-300">Reference</label>
         <input type="text" class="px-2 py-1 text-md rounded-lg border-secondary-dark dark:border-secondary-light border-2" 
                            placeholder="Enter reference here" v-model="reference" />
+        <div class="text-sm text-red-600 ps-5">{{ storeError.fieldMessage('payment_ref') }}</div>
         </div>
 
         <button @click.prevent="buyCoinsButton" v-if="coinsQuantity > 0"
