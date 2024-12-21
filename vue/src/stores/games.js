@@ -11,9 +11,9 @@ export const useGamesStore = defineStore('games', () => {
     const allGames = ref([])
     const meta = ref({})
 
-    const getHistory = async (pageNum, board) => {
+    const getHistory = async (pageNum, board, gameType) => {
         let params = new URLSearchParams(); 
-        params.append('type', 'A');
+        params.append('type', gameType);
         params.append('page', pageNum); 
 
         if (board !== "ALL") {

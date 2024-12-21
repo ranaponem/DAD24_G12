@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\GameTypeRequest;
-use App\Models\MultiplayerGamePlayed;
 use App\Models\Transaction;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -49,15 +48,11 @@ class GameController extends Controller
 
         $query = Game::when($type == Game::TYPE_SINGLEPLAYER, function ($query) use ($userId) {
             return $query->where('created_user_id', $userId)->where('type', Game::TYPE_SINGLEPLAYER);
-        })
-            ->when($type == 'A' || $type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
-                return $query->where('created_user_id', $userId)
-                    ->orWhereHas('multiplayerGamesPlayed', function ($subQuery) use ($userId) {
-                        $subQuery->where('user_id', $userId);
-                    });
             })
             ->when($type == Game::TYPE_MULTIPLAYER, function ($query) use ($userId) {
-                return $query->where('type', Game::TYPE_MULTIPLAYER);
+                return $query->whereHas('multiplayerGamesPlayed', function ($subQuery) use ($userId) {
+                        $subQuery->where('user_id', $userId);
+                    });
             });
 
         $attributesResponse = $this->readAttributes($request, $query);

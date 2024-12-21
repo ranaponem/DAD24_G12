@@ -2,6 +2,7 @@
 import { onMounted } from 'vue';
 import { useMemoryGameStore } from '@/stores/memoryGame';
 import Board from './Board.vue';
+import { onBeforeRouteLeave } from 'vue-router';
 
 const memoryGameStore = useMemoryGameStore();
 
@@ -17,6 +18,22 @@ onMounted(() => {
     if (memoryGameStore.gameFinished)
         memoryGameStore.createGame(memoryGameStore.boardId)
 })
+
+onBeforeRouteLeave ((to, from, next) => {
+  if(memoryGameStore.gameFinished){
+    next()
+    return
+  }
+  
+  const answer = window.confirm('Do you really want to leave? You will lose the game!')
+  if (answer) {
+    memoryGameStore.quitGame()
+    next()
+    return
+  }
+
+  next(false)
+});
 
 </script>
 
