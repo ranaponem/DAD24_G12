@@ -142,7 +142,7 @@ onMounted(() => {
                             {{ game.status === 'E' ? game.total_time : '---' }}
                         </td>
                         <td class="px-4 py-2">
-                            {{ game.status === 'E' ? formatDate(game.ended_at) : formatDate(game.began_at) }}
+                            {{ game.status === 'E' ? formatDate(game.ended_at) : '---' }}
                         </td>
                         <td class="px-4 py-2">{{ getStatusType(game.status) }}</td>
                     </tr>
