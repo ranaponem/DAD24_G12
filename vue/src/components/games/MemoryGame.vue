@@ -26,7 +26,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div id="memory-game" class="memory-game">
+  <div id="memory-game" class="flex flex-col items-center p-20">
     <div v-if="memoryGameStore.gameFinished" class="end-screen">
       <p>Turns taken: {{ memoryGameStore.turnsTaken }}</p>
       <p>Time spent: {{ memoryGameStore.formattedTime }}</p>
@@ -63,12 +63,6 @@ onMounted(() => {
 </template>
 
 <style>
-.memory-game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-}
 
 .game-board {
   display: grid;

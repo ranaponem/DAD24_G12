@@ -31,7 +31,7 @@ const storeAuth = useAuthStore()
 
     <!-- Main content section where RouterView renders -->
     <main class="flex-grow bg-gray-200 dark:bg-gray-800">
-      <RouterView />
+        <RouterView />
     </main>
   </div>
 </template>

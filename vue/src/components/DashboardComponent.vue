@@ -1,24 +1,10 @@
 <script setup>
-import {useRouter} from 'vue-router';
-
-const router = useRouter();
-
-const goToHistory = () => {
-        router.push('/history');
-};
-
-const goToSelectGameMode = () => {
-        router.push('/selectGameMode');
-};
-
-const goToScoreboard = () => {
-        router.push('/scoreboard');
-};
+import { useRouter } from 'vue-router';
 
 </script>
 
 <template>
-    <div class="flex flex-col min-h-screen">
+        <div class="flex h-full max-h-screen w-full mt-60">
 
                 <!-- Main content -->
                 <div class="flex flex-col items-center justify-center flex-grow">
@@ -27,19 +13,22 @@ const goToScoreboard = () => {
                         </h1>
 
                         <!-- Buttons -->
-                        <div class="flex space-x-4">
+                        <div class="flex flex-col items-center justify-center w-2/3 md:w-1/2 lg:w-2/5 xl:w-1/5 space-y-4">
                                 <!-- Left Button -->
-                                <button @click="goToHistory" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                <RouterLink to="/history"
+                                        class="w-full text-center px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                                         History
-                                </button>
+                                </RouterLink>
                                 <!-- Center Button -->
-                                <button @click="goToSelectGameMode" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
-                                        Select Game Mode
-                                </button>
+                                <RouterLink to="/games"
+                                        class="w-full text-center px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                        Play games
+                                </RouterLink>
                                 <!-- Right Button -->
-                                <button @click="goToScoreboard" class="w-full px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
+                                <RouterLink to="/scoreboard"
+                                        class="w-full text-center px-4 py-2 mt-6 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light">
                                         Scoreboard
-                                </button>
+                                </RouterLink>
                         </div>
                 </div>
         </div>

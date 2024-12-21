@@ -28,6 +28,10 @@ export const useAuthStore = defineStore('auth', () => {
   const userEmail = computed(() => {
     return user.value ? user.value.email : ''
   })
+  
+  const userBalance = computed(() => {
+    return user.value ? user.value.brain_coins_balance : 0
+  })
 
   const userType = computed(() => {
     return user.value ? user.value.type : ''
@@ -41,11 +45,11 @@ export const useAuthStore = defineStore('auth', () => {
     return avatarNoneAssetURL
   })
 
-  const userBalance = async () => {
+  const updateUserBalance = async () => {
     try{
       const responseCoins = await axios.get('users/mybalance')
-      const balance = ref(responseCoins.data.brain_coins_balance)
-      return balance.value
+      user.value.brain_coins_balance = responseCoins.data.brain_coins_balance
+      return user.value.brain_coins_balance
     }
     catch(e){
       storeError.setErrorMessages(
@@ -75,6 +79,7 @@ export const useAuthStore = defineStore('auth', () => {
       axios.defaults.headers.common.Authorization = 'Bearer ' + token.value
       const responseUser = await axios.get('users/me')
       user.value = responseUser.data.data
+      socket.emit('login', user.value)
       repeatRefreshToken()
       return user.value
     } catch (e) {
@@ -201,11 +206,12 @@ export const useAuthStore = defineStore('auth', () => {
   return {
     user,
     userName,
+    userBalance,
     userFirstLastName,
     userEmail,
     userType,
     userPhotoUrl,
-    userBalance,
+    updateUserBalance,
     login,
     logout,
     registerAccount,

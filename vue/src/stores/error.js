@@ -43,13 +43,13 @@ export const useErrorStore = defineStore('error', () => {
     let toastMessage = mainMessage
     switch (status) {
       case 401:
-        toastMessage = 'You are not authorized to access the server API!'
+        toastMessage = 'You are not authorized to access this resource!'
         break
       case 403:
-        toastMessage = 'You are forbidden to access the server resource!'
+        toastMessage = 'You are forbidden to access this resource!'
         break
       case 404:
-        toastMessage = 'Server resource not found!'
+        toastMessage = 'Resource not found!'
         break
       case 422:
         toastMessage = 'Data is invalid. Check field error messages!'

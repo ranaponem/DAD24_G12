@@ -40,7 +40,7 @@
   const userBalance = ref(0) // Ref to hold the resolved balance
 
   const fetchUserBalance = async () => {
-    const balance = await storeAuth.userBalance() // Await the resolved balance
+    const balance = await storeAuth.updateUserBalance() // Await the resolved balance
     if (balance !== false) {
       userBalance.value = balance
     }
@@ -62,7 +62,7 @@
 
 </script>
 <template>
-  <div class="w-full h-full border-secondary-dark dark:border-secondary-light
+  <div class="w-full lf:w-1/3 h-full border-secondary-dark dark:border-secondary-light
   border-2 bg-gray-50 dark:bg-gray-800 shadow-lg rounded-lg
   overflow-hidden">
     <div
@@ -88,7 +88,7 @@
           </button>
           <input
             type="number"
-            v-model.coinsQuantity="coinsQuantity"
+            v-model="coinsQuantity"
             @blur="validateInput"
             class="w-20 text-center text-2xl font-bold
             bg-gray-200 rounded-lg shadow-inner

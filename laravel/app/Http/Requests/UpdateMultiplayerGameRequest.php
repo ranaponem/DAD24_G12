@@ -3,9 +3,8 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
-class UpdateGameRequest extends FormRequest
+class UpdateMultiplayerGameRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +23,10 @@ class UpdateGameRequest extends FormRequest
     {
 
       return [
-        "status" => "required|string|in:PL,E,I",
-        "total_time" => "", //deprecated
-        "total_turns_winner" => "required_if:status,E|numeric|min:1",
+        "status" => "required|string|in:E,I",
+        "total_turns_winner" => "required_if:status,E|numeric",
+        "my_win" => "required_if:status,E|boolean",
+        "pairs" => "required_if:status,E|integer"
         ];
     }
 }

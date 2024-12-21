@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use App\Models\Game;
 use App\Models\MultiplayerGamePlayed;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class MultiplayerGamePlayedPolicy
 {
@@ -13,7 +13,7 @@ class MultiplayerGamePlayedPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
+        return true;
     }
 
     /**
@@ -21,7 +21,7 @@ class MultiplayerGamePlayedPolicy
      */
     public function view(User $user, MultiplayerGamePlayed $multiplayerGamePlayed): bool
     {
-        //
+        return $user->type == User::TYPE_ADMIN || $user->id == $multiplayerGamePlayed->user_id;
     }
 
     /**
@@ -29,38 +29,15 @@ class MultiplayerGamePlayedPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->type == User::TYPE_PLAYER;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, MultiplayerGamePlayed $multiplayerGamePlayed): bool
+    public function update(User $user, Game $game): bool
     {
-        //
-    }
-
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, MultiplayerGamePlayed $multiplayerGamePlayed): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can restore the model.
-     */
-    public function restore(User $user, MultiplayerGamePlayed $multiplayerGamePlayed): bool
-    {
-        //
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, MultiplayerGamePlayed $multiplayerGamePlayed): bool
-    {
-        //
+        return $user->type == User::TYPE_PLAYER &&
+            MultiplayerGamePlayed::where('user_id', $user->id)->where('game_id', $game->id)->first() != null;
     }
 }

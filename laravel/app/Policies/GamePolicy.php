@@ -37,6 +37,6 @@ class GamePolicy
      */
     public function update(User $user, Game $game): bool
     {
-        return $user->type == User::TYPE_PLAYER;
+        return $user->type == User::TYPE_PLAYER && $user->id == $game->user_id;
     }
 }

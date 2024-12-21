@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Middleware\CheckSanctumToken;
+use App\Models\Game;
+use App\Models\MultiplayerGamePlayed;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -65,7 +67,8 @@ Route::middleware(['auth:sanctum'])->group(function() {
     Route::post('/games', [GameController::class, 'store']);
 
     # Update partial
-    Route::patch('/games/{game}', [GameController::class, 'update']);
+    Route::patch('/games/{game}', [GameController::class, 'update'])
+        ->can('update', Game::class);
 
     # Get All
     Route::get('/multiplayer', [MultiplayerGamePlayedController::class, 'index']);
@@ -73,6 +76,12 @@ Route::middleware(['auth:sanctum'])->group(function() {
     # Get One
     Route::get('/multiplayer/{multiplayer_game_played}', [MultiplayerGamePlayedController::class, 'show']);
 
+    # Create Multiplayer game
+    Route::post('/multiplayer', [MultiplayerGamePlayedController::class, 'store'])
+        ->can('create', MultiplayerGamePlayed::class);
+    
+    # Update multiplayer
+    Route::patch('/multiplayer/{game}', [MultiplayerGamePlayedController::class, 'update']);
 
     # Get My
     Route::get('/transactions/my', [TransactionController::class, 'showMy'])

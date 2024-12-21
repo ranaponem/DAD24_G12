@@ -9,6 +9,7 @@ const props = defineProps({
     placeholder: { type: String, default: null },
     errorMessage: { type: String, default: null },
     asErrors: { type: Number, default: -1 },
+    autofocus: { type: Boolean, default: false },
 })
 
 </script>
@@ -24,7 +25,7 @@ const props = defineProps({
                     : 'border-lime-500 dark:border-lime-700 focus:ring-lime-300 dark:focus:ring-lime-500' 
                 : 'border-secondary-light dark:border-secondary-light focus:ring-purple-500 dark:focus:ring-purple-700'
             } focus:outline-none focus:border-transparent focus:ring-1`"
-            :placeholder="props.placeholder" v-model="model" :id="id" :readonly="props.readonly" />
+            :placeholder="props.placeholder" v-model="model" :id="id" :readonly="props.readonly" :autofocus="autofocus"/>
         <div v-show="errorMessage" class="text-sm text-red-600 ps-5">{{ errorMessage }}</div>
     </div>
 </template>
