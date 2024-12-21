@@ -13,7 +13,6 @@ const isSpinning = ref(false);
 
 const fetchScoreboard = async () => {
         allGames.value = await gamesStore.getScoreboard(selectedType.value, selectedBoard.value, selectedScope.value, selectedGameType.value);
-        console.log(allGames)
 };
 
 

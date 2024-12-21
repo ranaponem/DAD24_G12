@@ -8,12 +8,14 @@ import { useRouter } from 'vue-router';
 const router = useRouter()
 const storeBoard = useBoardStore()
 const storeAuth = useAuthStore()
-const storeGame = useMemoryGameStore()
+const storeMemoryGame = useMemoryGameStore()
 
-const startGame = (cols, rows,id,gameType) => {
-    storeGame.resetGame(rows,cols)
-    storeGame.createGame(id,gameType)
-    router.push({ name: 'MemoryGame' })
+const startGame = async (cols, rows, id) => {
+    storeMemoryGame.rows = rows
+    storeMemoryGame.columns = cols
+    const result = await storeMemoryGame.createGame(id)
+    if (result)
+        router.push({ name: 'MemoryGame' })
 }
 
 onMounted(() => {
@@ -33,7 +35,7 @@ onMounted(() => {
             <div class="space-y-2">
                 <button v-for="(board, index) in storeBoard.boards" :key="`${board.board_cols}x${board.board_rows}`"
                     :disabled="!storeAuth.user && index !== 0"
-                    @click.prevent="startGame(board.board_cols, board.board_rows, board.id, 'S')"
+                    @click.prevent="startGame(board.board_cols, board.board_rows, board.id)"
                     class="w-full px-4 py-2 text-white bg-primary hover:bg-tertiary rounded-md focus:outline-none focus:ring-2 focus:ring-tertiary-light block text-center"
                     :class="{ 'opacity-50 cursor-not-allowed': !storeAuth.user && index !== 0 }">
                     {{ `${board.board_cols}x${board.board_rows}` }}

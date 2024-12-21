@@ -106,7 +106,7 @@ class GameController extends Controller
 
     $game->fill($requestValidated);
     $game->ended_at = now();
-    $game->total_time = $game->began_at - $game->ended_at;
+    $game->total_time = Carbon::parse($game->ended_at)->diffInSeconds(Carbon::parse($game->began_at));
 
     $game->save();
 

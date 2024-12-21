@@ -74,7 +74,7 @@ Route::middleware(['auth:sanctum'])->group(function() {
 
     # Update partial
     Route::patch('/games/{game}', [GameController::class, 'update'])
-        ->can('update', Game::class);
+        ->can('update', 'game');
 
     # Get All
     Route::get('/multiplayer', [MultiplayerGamePlayedController::class, 'index']);

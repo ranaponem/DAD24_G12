@@ -25,7 +25,6 @@ class UpdateGameRequest extends FormRequest
 
       return [
         "status" => "required|string|in:PL,E,I",
-        "total_time" => "", //deprecated
         "total_turns_winner" => "required_if:status,E|numeric|min:1",
         ];
     }

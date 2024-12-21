@@ -59,7 +59,6 @@ const calculateMedian = (values) => {
 const updateGraph = async () => {
         try {
                 const fetchedData = await statisticsStore.getDetailedProfit(selectedProfitTimePeriod.value);
-                console.log('Fetched Data:', fetchedData);
 
                 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -112,14 +111,10 @@ const topUsersData = ref({
 const getUsers = async () => {
         try {
                 const fetchedUsersData = await statisticsStore.getTotalUsers(selectedUsersTimePeriod.value);
-                console.log('Fetched Users Data:', fetchedUsersData);
                 totalUsers.value = fetchedUsersData.total_users || 0;
                 const users = fetchedUsersData.top_spenders; 
-                console.log("Users: ", users)
                 const nicknames = users.map(user => user.nickname);
                 const data = users.map(user => user.total_spent);
-                console.log("Data", data)
-                console.log("Nicknames", nicknames)
 
                 topUsersData.value = {
                         labels: nicknames,
@@ -133,7 +128,6 @@ const getUsers = async () => {
                                 },
                         ],
                 };
-                console.log("TopUsersData: ", topUsersData.value.datasets[0].data[0])
 
         } catch (error) {
                 console.error('Error fetching or processing user data:', error);
@@ -153,7 +147,6 @@ const getTotalGames = async (timeRange) => {
 
         try {
                 const response = await axios.get('/statistics/total-games', { params });
-                console.log('RESPONSE = ', response)
                 totalGames.value = response.data.total_games || 0; 
                 singlePlayer.value = response.data.games_by_type.singleplayer || 0;
                 multiPlayer.value = response.data.games_by_type.multiplayer || 0;

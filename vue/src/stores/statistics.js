@@ -15,7 +15,6 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
                 try {
                         const response = await axios.get('/statistics/detailed-profit', { params });
-                        console.log('RESPONSE = ', response)
                         return response.data;
                 } catch (e) {
                         storeError.setErrorMessages(
@@ -34,7 +33,6 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
                 try {
                         const response = await axios.get('/statistics/total-users', { params });
-                        console.log('RESPONSE = ', response)
                         return response.data;
                 } catch (e) {
                         storeError.setErrorMessages(
@@ -53,7 +51,6 @@ export const useStatisticsStore = defineStore('statistics', () => {
 
                 try {
                         const response = await axios.get('/statistics/total-games', { params });
-                        console.log('GAMERESPONSE = ', response)
                         return response.data;
                 } catch (e) {
                         storeError.setErrorMessages(
