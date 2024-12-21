@@ -161,17 +161,17 @@ class GameController extends Controller
       else
         return response()->json(['message' => 'Invalid \'date_end\' date format: must be DD-mm-YYYY'], 402);
     }
+  }
+  private function gameTransaction($userId, $gameId, $type, $amount, $time)
+  {
+      $transaction = new Transaction();
+      $transaction->user_id = $userId;
+      $transaction->game_id = $gameId;
+      $transaction->type = $type;
+      $transaction->brain_coins = $amount;
+      $transaction->transaction_datetime = $time;
 
-    private function gameTransaction($userId, $gameId, $type, $amount, $time)
-    {
-        $transaction = new Transaction();
-        $transaction->user_id = $userId;
-        $transaction->game_id = $gameId;
-        $transaction->type = $type;
-        $transaction->brain_coins = $amount;
-        $transaction->transaction_datetime = $time;
-
-        $transaction->save();
-        return $transaction;
-    }
+      $transaction->save();
+      return $transaction;
+  }
 }
